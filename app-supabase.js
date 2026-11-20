@@ -56,7 +56,19 @@ function loginModal(after){
       <label>อีเมล<input id="lgEmail" type="email" required autocomplete="username"></label>
       <label>รหัสผ่าน<input id="lgPass" type="password" required autocomplete="current-password"></label>
       <div class="meta" id="lgMsg"></div><button class="btn full" type="submit">เข้าสู่ระบบ</button>
+      <button class="btn ghost full" type="button" id="lgSignup">สร้างบัญชีผู้ดูแล (ครั้งแรก)</button>
     </form>`);
+  document.getElementById('lgSignup').onclick = async () => {
+    const msg = document.getElementById('lgMsg'), email = lgEmail.value.trim(), pass = lgPass.value;
+    if (!email || pass.length < 8) { msg.textContent = 'ใส่อีเมล และตั้งรหัสผ่านอย่างน้อย 8 ตัวอักษร'; return; }
+    msg.textContent = 'กำลังสร้างบัญชี…';
+    const { data, error } = await sb.auth.signUp({ email, password: pass, options:{ emailRedirectTo: location.origin } });
+    if (error) { msg.textContent = '❌ ' + error.message; return; }
+    if (!data.session) { msg.textContent = '📧 ส่งอีเมลยืนยันแล้ว เปิดอีเมลแล้วกดลิงก์ยืนยัน จากนั้นกลับมาเข้าสู่ระบบ'; return; }
+    await refreshAuth();
+    msg.textContent = IS_ADMIN ? '✅ สร้างบัญชีแล้ว' : '⚠️ สร้างบัญชีแล้ว แต่อีเมลนี้ยังไม่ได้รับสิทธิ์ผู้ดูแล';
+    if (IS_ADMIN) { closeModal(); await loadPosSalesFromDB(); rerenderAll(); after && after(); }
+  };
   document.getElementById('lgForm').onsubmit = async e => {
     e.preventDefault(); const msg = document.getElementById('lgMsg'); msg.textContent = 'กำลังเข้าสู่ระบบ…';
     const { error } = await sb.auth.signInWithPassword({ email: lgEmail.value.trim(), password: lgPass.value });
