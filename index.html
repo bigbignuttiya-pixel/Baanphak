@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>บ้านผัก — จากสวนถึงครัวคุณ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f4ec; --card:#fff; --ink:#1f2a1c; --muted:#6b7563; --line:#e5e1d3;
+  --green:#2f6b3a; --green2:#4f9a4a; --leaf:#e4f0dc; --orange:#e2742b; --cream:#fdf8e8;
+  --red:#c2412d; --radius:16px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Sarabun',system-ui,sans-serif;font-size:15px;line-height:1.5}
+h1,h2,h3,.brand,.btn,.tab,.price{font-family:'Prompt',sans-serif}
+button{font:inherit;cursor:pointer}
+/* top bar */
+.top{position:sticky;top:0;z-index:20;background:var(--green);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:12px}
+.brand{font-weight:700;font-size:20px;display:flex;align-items:center;gap:8px}
+.brand small{font-weight:400;font-size:12px;opacity:.8;display:block;line-height:1}
+.views{margin-left:auto;display:flex;gap:4px;background:rgba(255,255,255,.12);padding:3px;border-radius:999px}
+.views button{border:0;background:transparent;color:#fff;padding:6px 12px;border-radius:999px;font-family:'Prompt';font-size:13px}
+.views button.on{background:#fff;color:var(--green)}
+.cartbtn{border:0;background:var(--orange);color:#fff;border-radius:999px;padding:7px 14px;font-family:'Prompt';font-weight:600;position:relative}
+.cartbtn b{background:#fff;color:var(--orange);border-radius:999px;padding:0 7px;margin-left:6px;font-size:12px}
+main{max-width:1180px;margin:0 auto;padding:16px}
+/* hero */
+.hero{background:linear-gradient(120deg,#2f6b3a,#4f9a4a);color:#fff;border-radius:22px;padding:22px;display:flex;gap:18px;align-items:center;overflow:hidden;position:relative}
+.hero{min-height:220px;background:#2f6b3a}
+.hero>div:not(.slides):not(.dots){position:relative;z-index:2}
+.slides{position:absolute;inset:0;z-index:0}
+.slides i{position:absolute;inset:-4%;background-size:cover;background-position:center;opacity:0;transition:opacity 1.6s ease;animation:kb 14s linear infinite alternate}
+.slides i.on{opacity:1}
+.slides::after{content:'';position:absolute;inset:0;background:linear-gradient(100deg,rgba(20,55,25,.82) 0%,rgba(20,55,25,.55) 55%,rgba(20,55,25,.15) 100%)}
+@keyframes kb{from{transform:scale(1) translateX(0)}to{transform:scale(1.12) translateX(-3%)}}
+.htag{display:inline-block;background:var(--orange);color:#fff;font-family:'Prompt';font-size:12.5px;padding:2px 10px;border-radius:999px;margin-bottom:6px}
+#hT,#hS,#hTag{transition:opacity .5s}
+.hero .hbtn{margin-top:10px;background:#fff;color:var(--green);border:0;border-radius:999px;padding:7px 14px;font-family:'Prompt';font-weight:600}
+.dots{position:absolute;right:14px;bottom:10px;z-index:2;display:flex;gap:5px}
+.dots b{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.45)}
+.dots b.on{background:#fff;width:18px;border-radius:9px;transition:.3s}
+.hero h1{text-shadow:0 2px 10px rgba(0,0,0,.35);margin:0 0 6px;font-size:26px;line-height:1.25}
+.hero p{margin:0;opacity:.9}
+.hero .em{font-size:64px;line-height:1;filter:drop-shadow(0 4px 8px rgba(0,0,0,.2))}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.pill{background:rgba(255,255,255,.18);border-radius:999px;padding:3px 10px;font-size:13px}
+/* category tabs */
+.cats{display:flex;gap:8px;overflow-x:auto;padding:14px 0 6px;scrollbar-width:none}
+.cats::-webkit-scrollbar{display:none}
+.tab{white-space:nowrap;border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;font-size:14px;color:var(--ink)}
+.tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.search{width:100%;border:1px solid var(--line);border-radius:12px;padding:10px 14px;font:inherit;background:#fff;margin-top:12px}
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;margin:18px 0 8px}
+.sec-h h2{margin:0;font-size:19px}
+.sec-h span{color:var(--muted);font-size:13px}
+/* grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.grid.kits{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.card{background:var(--card);border-radius:var(--radius);padding:12px;border:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.thumb{height:84px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:46px;background:var(--leaf)}
+.card h3{margin:0;font-size:15px;font-weight:600}
+.meta{color:var(--muted);font-size:12.5px}
+.price{font-weight:700;color:var(--green);font-size:17px}
+.price small{font-weight:400;color:var(--muted);font-size:12px}
+.tag{display:inline-block;font-size:11px;padding:1px 8px;border-radius:999px;background:var(--cream);color:#8a5a12;border:1px solid #f0e0b0}
+.tag.farm{background:var(--leaf);color:var(--green);border-color:#cfe3c4}
+.row{display:flex;align-items:center;gap:6px}
+.qty{display:flex;align-items:center;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin-left:auto}
+.qty button{border:0;background:#fff;width:30px;height:30px;font-size:17px;color:var(--green)}
+.qty span{min-width:48px;text-align:center;font-family:'Prompt';font-size:13px}
+.btn{border:0;background:var(--green);color:#fff;border-radius:999px;padding:8px 14px;font-weight:600;font-size:14px}
+.btn.ghost{background:#fff;color:var(--green);border:1px solid var(--green)}
+.btn.sm{padding:5px 11px;font-size:13px}
+.btn.full{width:100%}
+/* kit card */
+.kit .thumb{height:110px;font-size:40px;gap:4px;background:linear-gradient(135deg,#fff4d6,#e4f0dc)}
+.kit ul{margin:4px 0 0;padding:0;list-style:none;font-size:13px;color:var(--muted);columns:2;column-gap:12px}
+.kit li{break-inside:avoid}
+.kit li b{color:var(--ink);font-weight:500}
+.kit .serv{font-size:12.5px;color:var(--muted)}
+.ktype{position:absolute;top:8px;left:8px;background:#fff;border-radius:999px;font-size:11px;padding:2px 8px;font-family:'Prompt'}
+/* cart drawer */
+.mask{position:fixed;inset:0;background:rgba(20,30,15,.35);opacity:0;pointer-events:none;transition:.2s;z-index:30}
+.mask.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(420px,100%);background:#fff;z-index:31;transform:translateX(100%);transition:.25s;display:flex;flex-direction:column}
+.drawer.on{transform:none}
+.drawer header{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center}
+.drawer header h2{margin:0;font-size:18px}
+.drawer .x{margin-left:auto;border:0;background:none;font-size:22px}
+.citems{flex:1;overflow:auto;padding:8px 16px}
+.ci{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px dashed var(--line)}
+.ci .e{font-size:28px;width:40px;text-align:center}
+.ci .n{flex:1}
+.ci .n div{font-size:12.5px;color:var(--muted)}
+.cfoot{padding:14px 16px;border-top:1px solid var(--line);background:var(--cream)}
+.cfoot .l{display:flex;justify-content:space-between;margin:3px 0}
+.cfoot .t{font-family:'Prompt';font-weight:700;font-size:19px}
+.cfoot select{width:100%;padding:8px;border-radius:10px;border:1px solid var(--line);font:inherit;margin:6px 0}
+.chk{display:flex;gap:8px;align-items:center;font-size:14px;margin:6px 0}
+.empty{color:var(--muted);text-align:center;padding:40px 0}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;padding:9px 16px;border-radius:999px;font-family:'Prompt';font-size:14px;transition:.25s;z-index:40}
+.toast.on{transform:translateX(-50%)}
+.soon{background:#fff;border:1px dashed var(--line);border-radius:var(--radius);padding:40px;text-align:center;color:var(--muted)}
+.note{font-size:12.5px;color:var(--muted);margin-top:18px}
+/* tray packs */
+.tray{position:relative;height:150px;border-radius:14px;background:linear-gradient(160deg,#ffffff,#eef3f7);border:3px solid #e3eaf0;box-shadow:inset 0 0 0 6px #f6f9fb,0 2px 6px rgba(0,0,0,.06);overflow:hidden;padding:10px}
+.tray.dark{background:linear-gradient(160deg,#2b2b2b,#141414);border-color:#333;box-shadow:inset 0 0 0 6px #1d1d1d}
+.tray .items{display:flex;flex-wrap:wrap;gap:2px 6px;font-size:30px;line-height:1.15;align-content:flex-start;max-width:64%}
+.tray .items span:nth-child(odd){transform:rotate(-12deg)}
+.tray .items span:nth-child(3n){transform:rotate(18deg)}
+.tray::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,rgba(255,255,255,.55) 0 18%,transparent 30% 60%,rgba(255,255,255,.35) 72%,transparent 85%);pointer-events:none}
+.tray.clear{background:#fbfdfe;border-color:#dde8ee}
+.tray.round{border-radius:50%/40%}
+.balls{display:flex;flex-wrap:wrap;gap:3px;max-width:66%}
+.balls i{width:19px;height:19px;border-radius:50%;box-shadow:inset -2px -3px 0 rgba(0,0,0,.08)}
+.balls.tiny i{width:9px;height:11px;border-radius:45%}
+.lbl{position:absolute;right:8px;top:8px;width:36%;background:#fff;border:1px solid #ddd;border-radius:4px;font-size:8.5px;line-height:1.3;padding:4px 5px;color:#333;z-index:1;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.lbl b{display:block;color:var(--green);font-family:'Prompt';font-size:9.5px}
+.lbl .bc{height:12px;margin-top:3px;background:repeating-linear-gradient(90deg,#222 0 1px,transparent 1px 3px,#222 3px 5px,transparent 5px 6px)}
+/* dashboard */
+.seg{display:flex;background:#fff;border:1px solid var(--line);border-radius:999px;padding:2px}
+.seg button{white-space:nowrap;border:0;background:none;border-radius:999px;padding:4px 11px;font-family:'Prompt';font-size:13px;color:var(--muted)}
+.seg button.on{background:var(--ink);color:#fff}
+.kpis.big{margin:0 0 12px}.kpis.big .kpi{background:#fff;border:1px solid var(--line)}
+.kpi small{display:block;font-size:12px;color:var(--muted)}
+.ph{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.ph h3{margin:0;font-size:15.5px}
+.lg{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:5px}
+.sw{display:inline-block;width:16px;height:0;border-top:2.5px solid;margin-left:6px}
+.sw.g{border-color:#2f7d3c}.sw.o{border-color:#e2742b}.sw.dash{border-top-style:dashed}
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:auto}
+.tip{position:absolute;pointer-events:none;background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 9px;font-size:12.5px;box-shadow:0 4px 12px rgba(0,0,0,.1);white-space:nowrap;display:none}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hb{display:grid;grid-template-columns:minmax(90px,38%) 1fr auto;gap:6px 8px;align-items:center;font-size:13.5px}
+.hb .tr{height:14px;background:#f1efe6;border-radius:4px;overflow:hidden}
+.hb .tr i{display:block;height:100%;background:#2f7d3c;border-radius:0 4px 4px 0}
+.hb .v{font-family:'Prompt';font-size:13px;text-align:right}
+.st{font-size:12px;border-radius:999px;padding:1px 8px;font-family:'Prompt'}
+.st.ok{background:var(--leaf);color:var(--green)}.st.warn{background:#fff3d1;color:#9a6a00}
+@media (max-width:760px){.two{grid-template-columns:1fr}}
+/* fruit & deco */
+.tray.deco{height:170px;border-radius:22px;border-color:#e9dcc3;background:#fffdf8}
+.tray.deco .balls i{width:15px;height:15px}
+.tray.basket{height:170px;background:radial-gradient(ellipse at 50% 125%,#b88a4f 0 42%,#e3c48f 43% 58%,#fff8ec 59%);border-color:#e7d3ae}
+.tray.basket .items{font-size:26px;max-width:62%;padding-top:14px}
+.season{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:12px;margin-bottom:12px;font-size:13.5px}
+.cal{display:flex;gap:4px;overflow-x:auto;margin:10px 0 6px;scrollbar-width:none}
+.cal button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:3px 8px;font-size:12.5px;white-space:nowrap}
+.cal button.on{background:var(--green);color:#fff;border-color:var(--green)}
+#calOut i{font-style:normal;display:inline-block;background:var(--leaf);color:var(--green);border-radius:999px;padding:1px 9px;margin:3px 3px 0 0}
+.addf{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;font-size:13.5px}
+.addf label{display:flex;flex-direction:column;gap:3px;color:var(--muted)}
+.addf input,.addf select{border:1px solid var(--line);border-radius:8px;padding:7px 8px;font:inherit;color:var(--ink);background:#fff}
+.months{display:flex;flex-wrap:wrap;gap:4px}
+.months label{flex-direction:row;align-items:center;gap:2px;font-size:12.5px;border:1px solid var(--line);border-radius:6px;padding:1px 5px}
+.addf [hidden]{display:none!important}
+.custom-list{margin-top:10px;font-size:13px;color:var(--muted)}
+/* product photo */
+.photo{width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:12px;display:block;background:var(--leaf)}
+/* POS */
+.pos{display:grid;grid-template-columns:1fr 360px;gap:12px;align-items:start}
+.pos-left{min-width:0}
+.pos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
+.ptile{background:#fff;border:1px solid var(--line);border-radius:12px;padding:6px;text-align:left;display:flex;flex-direction:column;gap:3px}
+.ptile:active{transform:scale(.97)}
+.ptile img,.ptile .pe{width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:8px;background:var(--leaf);display:flex;align-items:center;justify-content:center;font-size:30px}
+.ptile b{font-size:12.5px;font-weight:600;line-height:1.25}
+.ptile span{font-family:'Prompt';font-size:12.5px;color:var(--green)}
+.pos-right{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:12px;position:sticky;top:64px}
+.pos-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.pos-lines{max-height:42vh;overflow:auto;border-top:1px dashed var(--line)}
+.pl{display:grid;grid-template-columns:1fr auto;gap:2px 8px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.pl .m{font-size:12.5px;color:var(--muted)}
+.pl .ctl{display:flex;gap:4px;align-items:center;justify-content:flex-end}
+.pl .ctl button{border:1px solid var(--line);background:#fff;border-radius:8px;width:28px;height:26px}
+.pos-sum{padding:8px 0;font-size:14px}
+.pos-sum .l{display:flex;justify-content:space-between;margin:2px 0}
+.pos-sum .t{font-family:'Prompt';font-weight:700;font-size:24px;color:var(--green)}
+.pos-sum input{width:64px}
+.pos-pay{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.pos-pay .btn{padding:12px 4px;font-size:14px}
+.modal{position:fixed;inset:0;background:rgba(20,30,15,.45);display:none;align-items:center;justify-content:center;z-index:50;padding:12px}
+.modal.on{display:flex}
+.mbox{background:#fff;border-radius:18px;padding:16px;width:min(420px,100%);max-height:92vh;overflow:auto}
+.mbox h3{margin:0 0 8px;font-size:18px}
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0}
+.numpad button{padding:12px;border:1px solid var(--line);background:#fafaf6;border-radius:10px;font-family:'Prompt';font-size:18px}
+.bigval{font-family:'Prompt';font-size:28px;text-align:right;border:1px solid var(--line);border-radius:10px;padding:6px 10px;background:var(--cream)}
+.quick{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.quick button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-family:'Prompt'}
+.change{font-family:'Prompt';font-size:22px;text-align:center;padding:8px;border-radius:10px;background:var(--leaf);color:var(--green);margin:8px 0}
+.receipt{font-family:'Sarabun',monospace;font-size:13.5px;border:1px dashed #bbb;padding:12px;border-radius:8px;background:#fffef8}
+.receipt .c{text-align:center}
+.receipt .r{display:flex;justify-content:space-between;gap:8px}
+.receipt hr{border:0;border-top:1px dashed #bbb;margin:6px 0}
+#qrBox{display:flex;justify-content:center;padding:10px;background:#fff}
+.posfab{display:none}
+@media (max-width:820px){.posfab{position:fixed;left:12px;right:12px;bottom:12px;z-index:25;border:0;border-radius:14px;padding:12px 16px;background:var(--green);color:#fff;font-family:'Prompt';font-size:16px;box-shadow:0 6px 18px rgba(0,0,0,.2)}.posfab.on{display:block}.pos{grid-template-columns:1fr}.pos-right{position:static}.pos-grid{grid-template-columns:repeat(3,1fr)}}
+/* back office */
+.panel{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px 16px;font-size:14px}
+.ctl label{display:flex;flex-direction:column;gap:4px}
+.ctl label.inl{flex-direction:row;align-items:center;gap:6px}
+.ctl label.inl input{margin-left:auto}
+.ctl input[type=range]{width:100%;accent-color:var(--green)}
+.in{width:76px;border:1px solid #ecd98f;background:#fffbe6;border-radius:8px;padding:4px 6px;font:inherit;text-align:right}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:12px}
+.kpi{background:var(--bg);border-radius:12px;padding:10px 12px}
+.kpi div{font-size:12.5px;color:var(--muted)}
+.kpi b{font-family:'Prompt';font-size:20px}
+.tw{overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:var(--radius)}
+.tbl{width:100%;border-collapse:collapse;font-size:14px;min-width:640px}
+.tbl th{text-align:left;font-family:'Prompt';font-weight:500;font-size:12.5px;color:var(--muted);padding:9px 10px;border-bottom:1px solid var(--line);background:#faf9f4;white-space:nowrap}
+.tbl td{padding:8px 10px;border-bottom:1px solid #f0ede2;vertical-align:middle}
+.tbl td.r,.tbl th.r{text-align:right}
+.tbl tr.k{cursor:pointer}
+.tbl tr.k:hover{background:#fbfaf5}
+.tbl tr.det td{background:#fbfaf5;font-size:13px;color:var(--muted)}
+.mg{font-family:'Prompt';font-weight:600;border-radius:999px;padding:1px 9px;font-size:13px}
+.mg.g{background:var(--leaf);color:var(--green)}.mg.y{background:#fff3d1;color:#9a6a00}.mg.r{background:#fde4df;color:var(--red)}
+.bar{height:6px;border-radius:9px;background:#eee;overflow:hidden;min-width:70px}
+.bar i{display:block;height:100%;background:var(--green2)}
+.det table{width:100%;border-collapse:collapse}
+.det table td{padding:3px 6px;border:0;background:none}
+@media (max-width:600px){
+  .hero{padding:18px}.hero h1{font-size:21px}.hero .em{font-size:44px}
+  .brand small{display:none}.views button{padding:6px 9px}
+  .grid{grid-template-columns:repeat(2,1fr);gap:9px}
+  .bn{display:none}.views button{white-space:nowrap}
+  .top{padding:8px 10px;gap:8px}.brand{font-size:16px}.views button{padding:5px 8px;font-size:12px}.cartbtn{padding:6px 10px}
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div class="top">
+  <div class="brand">🥬 <span class="bn">บ้านผัก</span> <small>Baan Phak<br>จากสวนถึงครัวคุณ</small></div>
+  <div class="views" id="views">
+    <button data-v="shop" class="on">หน้าร้าน</button>
+    <button data-v="pos">เคาน์เตอร์</button>
+    <button data-v="back">หลังบ้าน</button>
+    <button data-v="dash">แดชบอร์ด</button>
+  </div>
+  <button class="cartbtn" id="cartBtn">🧺<b id="cartCount">0</b></button>
+</div>
+
+<main>
+  <section id="v-shop">
+    <div class="hero"><div class="slides" id="slides"></div><div class="dots" id="dots"></div>
+      <div>
+        <span class="htag" id="hTag">🌿 บ้านผัก</span><h1 id="hT">ผักสดตัดเช้า ชุดพร้อมปรุง<br>ครบจบในตะกร้าเดียว</h1>
+        <p id="hS">ผักขายเป็นขีด (100 กรัม) ชุดต้มยำ แกง ต้ม ผัด เตรียมไว้ให้แล้ว พร้อมของใช้ในครัว</p>
+        <div class="pills"><span class="pill">🌱 ตรงจากสวน</span><span class="pill">🛵 ส่งวันนี้</span></div>
+      </div>
+    </div>
+    <input class="search" id="q" placeholder="ค้นหา เช่น คะน้า, ต้มยำ, ไข่ไก่ …">
+    <div class="cats" id="cats"></div>
+    <div id="shopBody"></div>
+    
+  </section>
+  <section id="v-pos" hidden>
+    <div class="pos">
+      <div class="pos-left">
+        <div class="row" style="gap:8px">
+          <input class="search" id="posQ" placeholder="🔍 ค้นหา หรือสแกนบาร์โค้ด/รหัสสินค้า แล้วกด Enter" style="margin:0">
+        </div>
+        <div class="cats" id="posCats"></div>
+        <div class="pos-grid" id="posGrid"></div>
+      </div>
+      <div class="pos-right">
+        <div class="pos-head"><b>🧾 บิลปัจจุบัน</b><span class="meta" id="posBillNo"></span></div>
+        <div class="pos-lines" id="posLines"></div>
+        <div class="pos-sum" id="posSum"></div>
+        <div class="pos-pay">
+          <button class="btn" data-pay="cash">💵 เงินสด</button>
+          <button class="btn" data-pay="qr" style="background:#1e4fa3">📱 พร้อมเพย์</button>
+          <button class="btn ghost" data-pay="card">💳 บัตร/โอน</button>
+        </div>
+        <button class="btn sm ghost full" id="posClear" style="margin-top:6px">ล้างบิล</button>
+      </div>
+      <button class="posfab" id="posFab"></button>
+    </div>
+    <div class="sec-h"><h2>📊 สรุปยอดหน้าร้านวันนี้</h2><span class="meta" id="posDate"></span></div>
+    <div class="kpis big" id="posKpi"></div>
+    <div class="panel"><div class="ph"><h3>บิลล่าสุด</h3></div><div class="tw" style="border:0"><table class="tbl" id="posBills"></table></div></div>
+    <div class="panel"><div class="ph"><h3>⚙️ ตั้งค่าเคาน์เตอร์</h3></div>
+      <div class="addf">
+        <label>พร้อมเพย์ร้าน (เบอร์มือถือ หรือเลขผู้เสียภาษี 13 หลัก)<input id="ppId" inputmode="numeric" placeholder="เช่น 0812345678"></label>
+        <label>ชื่อร้านบนใบเสร็จ<input id="shopName" value="บ้านผัก Baan Phak"></label>
+      </div>
+    </div>
+  </section>
+  <section id="v-back" hidden>
+    <div class="sec-h"><h2>⚙️ หลังบ้าน · ต้นทุนชุดพร้อมปรุง (BOM)</h2><span>แก้ตัวเลขช่องสีเหลืองได้ ระบบคำนวณใหม่ทันที</span></div>
+    <div class="panel">
+      <div class="ctl">
+        <label>📈 จำลองราคาผักจากสวน <b id="shockV">0%</b>
+          <input type="range" id="shock" min="-30" max="50" step="5" value="0"></label>
+        <label class="inl">📦 ค่าบรรจุภัณฑ์/ชุด <input class="in" type="number" id="packC" value="4" step="0.5"> ฿</label>
+        <label class="inl">🔪 ค่าแรงเตรียม/ชุด <input class="in" type="number" id="laborC" value="6" step="0.5"> ฿</label>
+        <label class="inl">🎯 กำไรเป้าหมาย <input class="in" type="number" id="targetM" value="35" step="1"> %</label>
+      </div>
+      <div class="kpis" id="backKpi"></div>
+    </div>
+    <div class="tw"><table class="tbl" id="kitTbl"></table></div>
+    <div class="sec-h"><h2>📷 รูปสินค้า</h2><span>ถ่ายจากกล้องมือถือ หรือเลือกไฟล์ภาพ</span></div>
+    <div class="panel">
+      <div class="addf">
+        <label>เลือกสินค้า<select id="phSel"></select></label>
+        <div style="display:flex;gap:8px;align-items:end;flex-wrap:wrap">
+          <label class="btn ghost" style="cursor:pointer">📸 ถ่ายรูป<input id="phCam" type="file" accept="image/*" capture="environment" hidden></label>
+          <label class="btn ghost" style="cursor:pointer">🖼️ เลือกจากไฟล์<input id="phFile" type="file" accept="image/*" hidden></label>
+          <button class="btn sm ghost" id="phDel" type="button">ลบรูปที่ใส่เอง</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center;margin-top:10px">
+        <div id="phPrev" style="width:180px"></div><div class="meta" id="phMsg">รูปจะถูกย่อขนาดอัตโนมัติ และแทนที่รูปเดิมของสินค้านั้น</div>
+      </div>
+    </div>
+    <div class="sec-h"><h2>➕ เพิ่มสินค้าใหม่</h2><span>ผัก ผลไม้ หรือของใช้ เพิ่มแล้วขึ้นหน้าร้านทันที</span></div>
+    <div class="panel">
+      <form class="addf" id="addForm">
+        <label>ชื่อสินค้า *<input id="aN" required placeholder="เช่น ผักกูด, มะปราง"></label>
+        <label>ประเภท *<select id="aC">
+          <option value="leaf">🥬 ผักใบ</option><option value="fruitveg">🍆 ผักผล/ผักฝัก</option><option value="root">🥕 หัว/ราก</option>
+          <option value="herb">🌿 สมุนไพร/เครื่องเทศ</option><option value="mush">🍄 เห็ด</option><option value="fruit">🍌 ผลไม้</option>
+          <option value="pantry">🍚 ข้าว ไข่ น้ำมัน เครื่องปรุง (ชิ้น)</option><option value="home">🧴 ของใช้ในบ้าน (ชิ้น)</option></select></label>
+        <label>ไอคอน<select id="aE">
+          <option>🥬</option><option>🌿</option><option>🍃</option><option>🌱</option><option>🥦</option><option>🥒</option><option>🍆</option><option>🌶️</option><option>🫛</option><option>🌽</option>
+          <option>🥕</option><option>🥔</option><option>🧅</option><option>🧄</option><option>🫚</option><option>🍄</option><option>🍅</option>
+          <option>🍌</option><option>🍊</option><option>🍋</option><option>🍎</option><option>🍐</option><option>🍇</option><option>🍓</option><option>🍉</option><option>🍈</option><option>🥭</option><option>🍍</option><option>🥝</option><option>🥑</option><option>🟠</option><option>🟢</option><option>🔴</option>
+          <option>🥚</option><option>🍚</option><option>🫗</option><option>🍶</option><option>🧂</option><option>🫙</option><option>🧴</option><option>🧻</option><option>📦</option></select></label>
+        <label id="aPL">ราคาขาย / 100 ก. (฿) *<input id="aP" type="number" step="0.5" min="0" required></label>
+        <label>ต้นทุน (฿) <input id="aCost" type="number" step="0.1" min="0" placeholder="เว้นว่าง = 62% ของราคาขาย"></label>
+        <label id="aLL">% สูญเสีย (ปอก/หั่น/คัดทิ้ง)<input id="aL" type="number" step="1" min="0" max="90" placeholder="ตามประเภท"></label>
+        <label id="aUL" hidden>หน่วยขาย<input id="aU" placeholder="ขวด, ถุง, แพ็ก"></label>
+        <label>รูปสินค้า (ถ่าย/เลือกไฟล์)<input id="aImg" type="file" accept="image/*"></label>
+        <label>สวน/แหล่งที่มา<input id="aF" placeholder="เช่น สวนลุงชัย นครปฐม"></label>
+        <div id="aSL" hidden style="grid-column:1/-1"><div class="meta" style="margin-bottom:4px">เดือนที่อยู่ในฤดู (ผลไม้)</div><div class="months" id="aS"></div></div>
+        <div style="grid-column:1/-1;display:flex;gap:8px;align-items:center"><button class="btn" type="submit">➕ เพิ่มสินค้า</button><span class="meta" id="aMsg"></span></div>
+      </form>
+      <div class="custom-list" id="customList"></div>
+    </div>
+    
+<div class="sec-h"><h2>🥬 ราคาวัตถุดิบ (ต่อ 100 กรัม)</h2><span>ต้นทุนคือราคาที่รับซื้อจากสวน</span></div>
+    <div class="cats" id="backCats"></div>
+    <div class="tw"><table class="tbl" id="vegTbl"></table></div>
+  </section>
+  <section id="v-dash" hidden>
+    <div class="sec-h"><h2>📊 แดชบอร์ดผลประกอบการ</h2>
+      <div class="seg" id="range"><button data-r="7">7 วัน</button><button data-r="14">14 วัน</button><button data-r="30" class="on">30 วัน</button></div></div>
+    <div class="kpis big" id="dKpi"></div>
+    <div class="panel"><div class="ph"><h3>ยอดขายและกำไรรายวัน</h3><span class="lg"><i class="sw g"></i>ยอดขาย <i class="sw o dash"></i>กำไร</span></div>
+      <div class="chart" id="lineC"></div></div>
+    <div class="two">
+      <div class="panel"><div class="ph"><h3>ยอดขายตามกลุ่มสินค้า</h3></div><div id="mixC"></div></div>
+      <div class="panel"><div class="ph"><h3>เงินที่จ่ายถึงเกษตรกร (ตามสวน)</h3></div><div id="farmC"></div></div>
+    </div>
+    <div class="panel"><div class="ph"><h3>🏆 สินค้าขายดี</h3></div><div class="tw" style="border:0"><table class="tbl" id="topT"></table></div></div>
+    <div class="panel"><div class="ph"><h3>📦 ล็อตที่แพ็กวันนี้ (FEFO)</h3><span class="meta">ของที่หมดอายุก่อนขายก่อน · ลดราคาอัตโนมัติ 17:00</span></div><div class="tw" style="border:0"><table class="tbl" id="lotT"></table></div></div>
+    <p class="note">* ข้อมูลยอดขายในแดชบอร์ดเป็นข้อมูลจำลองสำหรับสาธิต ต้นทุนดึงจากหน้าหลังบ้านจริง ปรับราคาที่หลังบ้านแล้วตัวเลขที่นี่จะเปลี่ยนตาม</p>
+  </section>
+</main>
+
+<div class="mask" id="mask"></div>
+<aside class="drawer" id="drawer">
+  <header><h2>🧺 ตะกร้าของฉัน</h2><button class="x" id="closeCart">×</button></header>
+  <div class="citems" id="citems"></div>
+  <div class="cfoot" id="cfoot"></div>
+</aside>
+<div class="toast" id="toast"></div>
+<div class="modal" id="modal"><div class="mbox" id="mbox"></div></div>
+
+<script>
+/* ============ DATA ============ */
+// ผัก/ผลไม้: p = ราคาขายต่อ 100 กรัม (บาท), farm = สวนต้นทาง
+const CATS = [
+  {id:'kit',   name:'🍲 ชุดพร้อมปรุง'},
+  {id:'cut',   name:'🍉 ผลไม้ตัดพร้อมทาน'},
+  {id:'deco',  name:'🎁 ถาดผลไม้จัดแต่ง/กระเช้า'},
+  {id:'leaf',  name:'🥬 ผักใบ'},
+  {id:'fruitveg',name:'🍆 ผักผล/ผักฝัก'},
+  {id:'root',  name:'🥕 หัว/ราก'},
+  {id:'herb',  name:'🌿 สมุนไพร/เครื่องเทศ'},
+  {id:'mush',  name:'🍄 เห็ด'},
+  {id:'fruit', name:'🍌 ผลไม้'},
+  {id:'pantry',name:'🍚 ข้าว ไข่ น้ำมัน เครื่องปรุง'},
+  {id:'home',  name:'🧴 ของใช้ในบ้าน'},
+];
+const VEG = [
+  // ผักใบ
+  {id:'kana',  n:'คะน้า', e:'🥬', c:'leaf', p:7,  farm:'สวนลุงชัย นครปฐม'},
+  {id:'bung',  n:'ผักบุ้งจีน', e:'🌱', c:'leaf', p:5,  farm:'สวนป้าศรี ราชบุรี'},
+  {id:'kwang', n:'กวางตุ้ง', e:'🥬', c:'leaf', p:6,  farm:'สวนลุงชัย นครปฐม'},
+  {id:'kadkao',n:'ผักกาดขาว', e:'🥬', c:'leaf', p:5,  farm:'ดอยอ่างขาง เชียงใหม่'},
+  {id:'kalam', n:'กะหล่ำปลี', e:'🥬', c:'leaf', p:4,  farm:'ดอยอ่างขาง เชียงใหม่'},
+  {id:'salad', n:'ผักกาดหอม', e:'🥗', c:'leaf', p:10, farm:'ไฮโดรฯ บ้านสวนสุข'},
+  {id:'kuenchai',n:'ขึ้นฉ่าย', e:'🌿', c:'leaf', p:12, farm:'สวนป้าศรี ราชบุรี'},
+  {id:'tamlueng',n:'ตำลึง', e:'🍃', c:'leaf', p:6,  farm:'สวนป้าศรี ราชบุรี'},
+  {id:'bungthai',n:'ผักบุ้งไทย', e:'🌱', c:'leaf', p:5, farm:'สวนป้าศรี ราชบุรี'},
+  {id:'kanahk',n:'คะน้าฮ่องกง', e:'🥬', c:'leaf', p:9, farm:'สวนลุงชัย นครปฐม'},
+  {id:'hongtae',n:'ผักกาดฮ่องเต้', e:'🥬', c:'leaf', p:8, farm:'สวนลุงชัย นครปฐม'},
+  {id:'kadkhiao',n:'ผักกาดเขียวปลี', e:'🥬', c:'leaf', p:5, farm:'สวนลุงชัย นครปฐม'},
+  {id:'puayleng',n:'ผักปวยเล้ง', e:'🥬', c:'leaf', p:12, farm:'ดอยอ่างขาง เชียงใหม่'},
+  {id:'phakkhom',n:'ผักโขม', e:'🍃', c:'leaf', p:6, farm:'สวนป้าศรี ราชบุรี'},
+  {id:'kalammuang',n:'กะหล่ำปลีม่วง', e:'🥬', c:'leaf', p:8, farm:'ดอยอ่างขาง เชียงใหม่'},
+  {id:'iceberg',n:'ผักกาดแก้ว (Iceberg)', e:'🥬', c:'leaf', p:9, farm:'ดอยอ่างขาง เชียงใหม่'},
+  {id:'redoak',n:'เรดโอ๊ค', e:'🥗', c:'leaf', p:14, farm:'ไฮโดรฯ บ้านสวนสุข'},
+  {id:'greenoak',n:'กรีนโอ๊ค', e:'🥗', c:'leaf', p:14, farm:'ไฮโดรฯ บ้านสวนสุข'},
+  {id:'cos',n:'คอส (Cos)', e:'🥗', c:'leaf', p:14, farm:'ไฮโดรฯ บ้านสวนสุข'},
+  {id:'kale',n:'เคล (Kale)', e:'🥬', c:'leaf', p:18, farm:'ไฮโดรฯ บ้านสวนสุข'},
+  {id:'rocket',n:'ร็อกเก็ต', e:'🌿', c:'leaf', p:22, farm:'ไฮโดรฯ บ้านสวนสุข'},
+  {id:'cauli',n:'ดอกกะหล่ำ', e:'🥦', c:'leaf', p:8, farm:'ดอยอ่างขาง เชียงใหม่'},
+  {id:'brocc',n:'บร็อคโคลี', e:'🥦', c:'leaf', p:12, farm:'ดอยอ่างขาง เชียงใหม่'},
+  {id:'yodfak',n:'ยอดฟักแม้ว', e:'🌱', c:'leaf', p:8, farm:'ดอยอินทนนท์'},
+  {id:'phakwan',n:'ผักหวานบ้าน', e:'🍃', c:'leaf', p:12, farm:'สวนป้าศรี ราชบุรี'},
+  {id:'chaom',n:'ชะอม', e:'🌿', c:'leaf', p:10, farm:'สวนป้าศรี ราชบุรี'},
+  {id:'krathin',n:'ยอดกระถิน', e:'🌿', c:'leaf', p:6, farm:'สวนป้าศรี ราชบุรี'},
+  {id:'sano',n:'ดอกโสน', e:'🌼', c:'leaf', p:12, farm:'สวนป้าศรี ราชบุรี'},
+  {id:'khae',n:'ดอกแค', e:'🌸', c:'leaf', p:10, farm:'สวนป้าศรี ราชบุรี'},
+  // ผักผล
+  {id:'tomato',n:'มะเขือเทศ', e:'🍅', c:'fruitveg', p:6,  farm:'สวนเกษตรอินทรีย์ กาญจนบุรี'},
+  {id:'cuke',  n:'แตงกวา', e:'🥒', c:'fruitveg', p:4,  farm:'สวนลุงชัย นครปฐม'},
+  {id:'eggpl', n:'มะเขือยาว', e:'🍆', c:'fruitveg', p:6,  farm:'สวนลุงชัย นครปฐม'},
+  {id:'praw',  n:'มะเขือเปราะ', e:'🟢', c:'fruitveg', p:7,  farm:'สวนป้าศรี ราชบุรี'},
+  {id:'puang', n:'มะเขือพวง', e:'🫛', c:'fruitveg', p:8,  farm:'สวนป้าศรี ราชบุรี'},
+  {id:'tua',   n:'ถั่วฝักยาว', e:'🫛', c:'fruitveg', p:7,  farm:'สวนลุงชัย นครปฐม'},
+  {id:'corn',  n:'ข้าวโพดอ่อน', e:'🌽', c:'fruitveg', p:9,  farm:'สวนเกษตรอินทรีย์ กาญจนบุรี'},
+  {id:'pumpk', n:'ฟักทอง', e:'🎃', c:'fruitveg', p:4,  farm:'สวนเกษตรอินทรีย์ กาญจนบุรี'},
+  {id:'buab',  n:'บวบ', e:'🥒', c:'fruitveg', p:5,  farm:'สวนป้าศรี ราชบุรี'},
+  {id:'chifah',n:'พริกชี้ฟ้า', e:'🌶️', c:'fruitveg', p:10, farm:'สวนพริกบ้านโป่ง'},
+  {id:'mara',  n:'มะระจีน', e:'🥒', c:'fruitveg', p:6, farm:'สวนลุงชัย นครปฐม'},
+  {id:'marakn',n:'มะระขี้นก', e:'🥒', c:'fruitveg', p:10, farm:'สวนป้าศรี ราชบุรี'},
+  {id:'fakkhiao',n:'ฟักเขียว', e:'🥒', c:'fruitveg', p:3, farm:'สวนลุงชัย นครปฐม'},
+  {id:'namtao',n:'น้ำเต้า', e:'🍐', c:'fruitveg', p:4, farm:'สวนลุงชัย นครปฐม'},
+  {id:'taengran',n:'แตงร้าน', e:'🥒', c:'fruitveg', p:4, farm:'สวนลุงชัย นครปฐม'},
+  {id:'zucchini',n:'ซูกินี', e:'🥒', c:'fruitveg', p:12, farm:'ดอยอ่างขาง เชียงใหม่'},
+  {id:'pumpjp',n:'ฟักทองญี่ปุ่น', e:'🎃', c:'fruitveg', p:7, farm:'ดอยอ่างขาง เชียงใหม่'},
+  {id:'okra',  n:'กระเจี๊ยบเขียว', e:'🫑', c:'fruitveg', p:8, farm:'สวนเกษตรอินทรีย์ กาญจนบุรี'},
+  {id:'tuaphu',n:'ถั่วพู', e:'🫛', c:'fruitveg', p:9, farm:'สวนป้าศรี ราชบุรี'},
+  {id:'lantao',n:'ถั่วลันเตา', e:'🫛', c:'fruitveg', p:14, farm:'ดอยอ่างขาง เชียงใหม่'},
+  {id:'tuakhaek',n:'ถั่วแขก', e:'🫛', c:'fruitveg', p:9, farm:'ดอยอ่างขาง เชียงใหม่'},
+  {id:'ngok',  n:'ถั่วงอก', e:'🌱', c:'fruitveg', p:3, farm:'โรงเพาะถั่วงอกนนทบุรี'},
+  {id:'sweetcorn',n:'ข้าวโพดหวาน', e:'🌽', c:'fruitveg', p:4, farm:'สวนเกษตรอินทรีย์ กาญจนบุรี'},
+  {id:'eggpurple',n:'มะเขือม่วง', e:'🍆', c:'fruitveg', p:7, farm:'สวนลุงชัย นครปฐม'},
+  {id:'phrikyuak',n:'พริกหยวก', e:'🫑', c:'fruitveg', p:8, farm:'สวนพริกบ้านโป่ง'},
+  {id:'bell',  n:'พริกหวาน (แดง/เหลือง)', e:'🫑', c:'fruitveg', p:18, farm:'ดอยอ่างขาง เชียงใหม่'},
+  {id:'sato',  n:'สะตอ (แกะเม็ด)', e:'🫛', c:'fruitveg', p:30, farm:'สวนสะตอชุมพร'},
+  {id:'papdib',n:'มะละกอดิบ (ส้มตำ)', e:'🥗', c:'fruitveg', p:3, farm:'สวนเกษตรอินทรีย์ กาญจนบุรี'},
+  {id:'phrikkr',n:'พริกกะเหรี่ยง', e:'🌶️', c:'fruitveg', p:25, farm:'สวนพริกกาญจนบุรี'},
+  {id:'kinoo', n:'พริกขี้หนู', e:'🌶️', c:'fruitveg', p:18, farm:'สวนพริกบ้านโป่ง'},
+  // หัว/ราก
+  {id:'carrot',n:'แครอท', e:'🥕', c:'root', p:5,  farm:'ดอยอ่างขาง เชียงใหม่'},
+  {id:'chaitao',n:'ไชเท้า', e:'🥕', c:'root', p:4,  farm:'ดอยอ่างขาง เชียงใหม่'},
+  {id:'potato',n:'มันฝรั่ง', e:'🥔', c:'root', p:5,  farm:'สวนแม่โจ้ เชียงใหม่'},
+  {id:'onion', n:'หอมใหญ่', e:'🧅', c:'root', p:5,  farm:'สวนแม่โจ้ เชียงใหม่'},
+  {id:'shallot',n:'หอมแดง', e:'🧅', c:'root', p:10, farm:'ศรีสะเกษ'},
+  {id:'garlic',n:'กระเทียมไทย', e:'🧄', c:'root', p:12, farm:'ศรีสะเกษ'},
+  {id:'taro',  n:'เผือก', e:'🥔', c:'root', p:5, farm:'สวนเผือกอยุธยา'},
+  {id:'sweetpot',n:'มันเทศ (เนื้อเหลือง)', e:'🍠', c:'root', p:5, farm:'สวนแม่โจ้ เชียงใหม่'},
+  {id:'purplepot',n:'มันม่วงญี่ปุ่น', e:'🍠', c:'root', p:8, farm:'สวนแม่โจ้ เชียงใหม่'},
+  {id:'beet',  n:'บีทรูท', e:'🟣', c:'root', p:8, farm:'ดอยอ่างขาง เชียงใหม่'},
+  {id:'redonion',n:'หอมใหญ่ม่วง', e:'🧅', c:'root', p:7, farm:'สวนแม่โจ้ เชียงใหม่'},
+  {id:'garlicsolo',n:'กระเทียมโทน', e:'🧄', c:'root', p:20, farm:'ศรีสะเกษ'},
+  {id:'bamboo',n:'หน่อไม้ไผ่ตง (ต้ม)', e:'🎋', c:'root', p:5, farm:'ปราจีนบุรี'},
+  {id:'rootpakchi',n:'รากผักชี', e:'🌿', c:'root', p:15, farm:'สวนลุงชัย นครปฐม'},
+  // สมุนไพร
+  {id:'lemongr',n:'ตะไคร้', e:'🌾', c:'herb', p:6,  farm:'สวนสมุนไพรบ้านไร่'},
+  {id:'galang',n:'ข่า', e:'🫚', c:'herb', p:7,  farm:'สวนสมุนไพรบ้านไร่'},
+  {id:'ginger',n:'ขิง', e:'🫚', c:'herb', p:8,  farm:'สวนสมุนไพรบ้านไร่'},
+  {id:'krachai',n:'กระชาย', e:'🫚', c:'herb', p:10, farm:'สวนสมุนไพรบ้านไร่'},
+  {id:'gingersoi',n:'ขิงซอย (พร้อมใช้)', e:'🫚', c:'herb', p:16, farm:'สวนสมุนไพรบ้านไร่', prep:true},
+  {id:'krachaisoi',n:'กระชายซอย (พร้อมใช้)', e:'🫚', c:'herb', p:20, farm:'สวนสมุนไพรบ้านไร่', prep:true},
+  {id:'makrut',n:'ใบมะกรูด', e:'🍃', c:'herb', p:20, farm:'สวนสมุนไพรบ้านไร่'},
+  {id:'lime',  n:'มะนาว', e:'🍋', c:'herb', p:8,  farm:'สวนมะนาวเพชรบุรี'},
+  {id:'krapao',n:'กะเพรา', e:'🌿', c:'herb', p:12, farm:'สวนป้าศรี ราชบุรี'},
+  {id:'horapa',n:'โหระพา', e:'🌿', c:'herb', p:12, farm:'สวนป้าศรี ราชบุรี'},
+  {id:'pepper',n:'พริกไทยอ่อน', e:'🫛', c:'herb', p:25, farm:'สวนพริกไทยจันทบุรี'},
+  {id:'maenglak',n:'ใบแมงลัก', e:'🌿', c:'herb', p:12, farm:'สวนป้าศรี ราชบุรี'},
+  {id:'mint',  n:'สะระแหน่', e:'🌿', c:'herb', p:15, farm:'สวนป้าศรี ราชบุรี'},
+  {id:'chiphrang',n:'ผักชีฝรั่ง', e:'🌿', c:'herb', p:12, farm:'สวนลุงชัย นครปฐม'},
+  {id:'chilao',n:'ผักชีลาว', e:'🌿', c:'herb', p:12, farm:'สวนลุงชัย นครปฐม'},
+  {id:'phaew', n:'ผักแพว', e:'🌿', c:'herb', p:12, farm:'สวนป้าศรี ราชบุรี'},
+  {id:'chaplu',n:'ใบชะพลู', e:'🍃', c:'herb', p:10, farm:'สวนป้าศรี ราชบุรี'},
+  {id:'buabok',n:'ใบบัวบก', e:'🍃', c:'herb', p:12, farm:'สวนสมุนไพรบ้านไร่'},
+  {id:'toey',  n:'ใบเตย', e:'🌿', c:'herb', p:8, farm:'สวนสมุนไพรบ้านไร่'},
+  {id:'khamin',n:'ขมิ้นชัน', e:'🫚', c:'herb', p:10, farm:'สวนสมุนไพรบ้านไร่'},
+  {id:'khingon',n:'ขิงอ่อน', e:'🫚', c:'herb', p:10, farm:'สวนสมุนไพรบ้านไร่'},
+  {id:'makrutluk',n:'มะกรูด (ลูก)', e:'🍋', c:'herb', p:12, farm:'สวนสมุนไพรบ้านไร่'},
+  {id:'pakchi',n:'ผักชี', e:'🌿', c:'herb', p:15, farm:'สวนลุงชัย นครปฐม'},
+  {id:'tonhom',n:'ต้นหอม', e:'🌱', c:'herb', p:12, farm:'สวนลุงชัย นครปฐม'},
+  // เห็ด
+  {id:'fang',  n:'เห็ดฟาง', e:'🍄', c:'mush', p:12, farm:'ฟาร์มเห็ดบ้านแพ้ว'},
+  {id:'nangfa',n:'เห็ดนางฟ้า', e:'🍄', c:'mush', p:8,  farm:'ฟาร์มเห็ดบ้านแพ้ว'},
+  {id:'hom',   n:'เห็ดหอมสด', e:'🍄', c:'mush', p:15, farm:'ฟาร์มเห็ดดอยสะเก็ด'},
+  {id:'eryngii',n:'เห็ดออรินจิ', e:'🍄', c:'mush', p:14, farm:'ฟาร์มเห็ดดอยสะเก็ด'},
+  {id:'shimeji',n:'เห็ดชิเมจิ', e:'🍄', c:'mush', p:16, farm:'ฟาร์มเห็ดดอยสะเก็ด'},
+  {id:'nangrom',n:'เห็ดนางรม', e:'🍄', c:'mush', p:8, farm:'ฟาร์มเห็ดบ้านแพ้ว'},
+  {id:'paohue',n:'เห็ดเป๋าฮื้อ', e:'🍄', c:'mush', p:12, farm:'ฟาร์มเห็ดบ้านแพ้ว'},
+  {id:'huhnu', n:'เห็ดหูหนูสด', e:'🍄', c:'mush', p:10, farm:'ฟาร์มเห็ดบ้านแพ้ว'},
+  {id:'button',n:'เห็ดแชมปิญอง', e:'🍄', c:'mush', p:18, farm:'ฟาร์มเห็ดดอยสะเก็ด'},
+  {id:'kemtong',n:'เห็ดเข็มทอง', e:'🍄', c:'mush', p:10, farm:'ฟาร์มเห็ดดอยสะเก็ด'},
+  // ผลไม้ — s = เดือนที่อยู่ในฤดู, k = อุณหภูมิเก็บ, d = อายุเก็บโดยประมาณ (วัน)
+  {id:'banana',n:'กล้วยหอมทอง', e:'🍌', c:'fruit', p:5,  farm:'สวนกล้วยปทุมธานี', col:'#f3e07a', s:[1,2,3,4,5,6,7,8,9,10,11,12], k:'13°C', d:5},
+  {id:'kluaikhai',n:'กล้วยไข่', e:'🍌', c:'fruit', p:5, farm:'กำแพงเพชร', col:'#f2cf5b', s:[7,8,9,10], k:'13°C', d:5},
+  {id:'namwa', n:'กล้วยน้ำว้า', e:'🍌', c:'fruit', p:3.5, farm:'สวนกล้วยนครปฐม', col:'#efe4a8', s:[1,2,3,4,5,6,7,8,9,10,11,12], k:'13°C', d:5},
+  {id:'orange',n:'ส้มสายน้ำผึ้ง', e:'🍊', c:'fruit', p:10, farm:'สวนส้มฝาง เชียงใหม่', col:'#f9a825', s:[11,12,1,2], k:'5–8°C', d:14},
+  {id:'mandarin',n:'ส้มแมนดาริน (นำเข้า)', e:'🍊', c:'fruit', p:9, farm:'นำเข้า', col:'#fb8c00', s:[11,12,1,2], k:'5–8°C', d:14},
+  {id:'pomelo',n:'ส้มโอทับทิมสยาม', e:'🟢', c:'fruit', p:9,  farm:'ปากพนัง นครศรีธรรมราช', col:'#f4a6a0', s:[8,9,10,11], k:'10°C', d:30},
+  {id:'papaya',n:'มะละกอแขกดำ (สุก)', e:'🧡', c:'fruit', p:5,  farm:'สวนเกษตรอินทรีย์ กาญจนบุรี', col:'#f08a4b', s:[1,2,3,4,5,6,7,8,9,10,11,12], k:'10–13°C', d:4},
+  {id:'pine',  n:'สับปะรดภูแล', e:'🍍', c:'fruit', p:3,  farm:'สวนสับปะรดเชียงราย', col:'#f6cf45', s:[1,2,3,4,5,6,7,8,9,10,11,12], k:'8–10°C', d:7},
+  {id:'mango', n:'มะม่วงน้ำดอกไม้', e:'🥭', c:'fruit', p:8,  farm:'สวนมะม่วงฉะเชิงเทรา', col:'#f7b733', s:[3,4,5], k:'13°C', d:5},
+  {id:'mamuang',n:'มะม่วงเขียวเสวย (มัน)', e:'🥭', c:'fruit', p:6, farm:'สวนมะม่วงพิษณุโลก', col:'#c8d86a', s:[11,12,1,2,3], k:'13°C', d:7},
+  {id:'melon', n:'แตงโม', e:'🍉', c:'fruit', p:2.5,farm:'สวนแตงโมสุพรรณ', col:'#ec4f57', s:[1,2,3,4,11,12], k:'10–15°C', d:14},
+  {id:'taengthai',n:'แตงไทย', e:'🍈', c:'fruit', p:4, farm:'สวนแตงอ่างทอง', col:'#f3d9a4', s:[3,4,5,6,7], k:'10°C', d:5},
+  {id:'cantal',n:'เมล่อนญี่ปุ่น', e:'🍈', c:'fruit', p:8,  farm:'ฟาร์มเมล่อนสระบุรี', col:'#f4b860', s:[1,2,3,4,5,6,7,8,9,10,11,12], k:'5–10°C', d:7},
+  {id:'dragon',n:'แก้วมังกรเนื้อขาว', e:'🐉', c:'fruit', p:6,  farm:'สวนแก้วมังกรจันทบุรี', col:'#f5f2ec', s:[5,6,7,8,9], k:'10°C', d:10},
+  {id:'dragonred',n:'แก้วมังกรเนื้อแดง', e:'🐉', c:'fruit', p:8, farm:'สวนแก้วมังกรจันทบุรี', col:'#b4205a', s:[5,6,7,8,9], k:'10°C', d:10},
+  {id:'guava', n:'ฝรั่งกิมจู', e:'🍏', c:'fruit', p:5,  farm:'สวนฝรั่งราชบุรี', col:'#e9f2cf', s:[1,2,3,4,5,6,7,8,9,10,11,12], k:'8–10°C', d:7},
+  {id:'chompu',n:'ชมพู่ทับทิมจันท์', e:'🔔', c:'fruit', p:10, farm:'สวนชมพู่นครปฐม', col:'#d8344a', s:[12,1,2,3,4], k:'8–10°C', d:5},
+  {id:'mangosteen',n:'มังคุด', e:'🟣', c:'fruit', p:9, farm:'สวนมังคุดจันทบุรี', col:'#f7f4ee', s:[5,6,7], k:'13°C', d:14},
+  {id:'rambutan',n:'เงาะโรงเรียน', e:'🔴', c:'fruit', p:6, farm:'สวนเงาะสุราษฎร์ธานี', col:'#f8f6ef', s:[5,6,7,8], k:'10°C', d:7},
+  {id:'longan',n:'ลำไยอีดอ', e:'🟤', c:'fruit', p:7, farm:'สวนลำไยลำพูน', col:'#efe6d0', s:[7,8,9], k:'2–5°C', d:14},
+  {id:'lychee',n:'ลิ้นจี่ฮงฮวย', e:'🔴', c:'fruit', p:12, farm:'สวนลิ้นจี่เชียงราย', col:'#f6efea', s:[4,5], k:'2–5°C', d:10},
+  {id:'durian',n:'ทุเรียนหมอนทอง', e:'🟡', c:'fruit', p:18, farm:'สวนทุเรียนระยอง', col:'#f6d36b', s:[4,5,6,7], k:'15°C', d:5},
+  {id:'longkong',n:'ลองกอง', e:'🟡', c:'fruit', p:7, farm:'นราธิวาส', col:'#f3edd8', s:[8,9,10], k:'15°C', d:7},
+  {id:'salak', n:'สละสุมาลี', e:'🟤', c:'fruit', p:8, farm:'สวนสละจันทบุรี', col:'#f1e3b8', s:[5,6,7,8], k:'10°C', d:10},
+  {id:'jack',  n:'ขนุน (แกะเนื้อ)', e:'🟨', c:'fruit', p:12, farm:'สวนขนุนปราจีนบุรี', col:'#f5c13d', s:[1,2,3,4,5,6], k:'14°C', d:3},
+  {id:'sapodilla',n:'ละมุด', e:'🟤', c:'fruit', p:6, farm:'สวนละมุดนครปฐม', col:'#c88d5a', s:[10,11,12], k:'15°C', d:5},
+  {id:'custard',n:'น้อยหน่า', e:'🟢', c:'fruit', p:10, farm:'ปากช่อง นครราชสีมา', col:'#f5f3ea', s:[7,8,9], k:'15°C', d:4},
+  {id:'starfruit',n:'มะเฟือง', e:'⭐', c:'fruit', p:6, farm:'สวนมะเฟืองนนทบุรี', col:'#f0d94a', s:[8,9,10,11], k:'8–10°C', d:10},
+  {id:'mayong',n:'มะยงชิด', e:'🟠', c:'fruit', p:15, farm:'สวนมะยงชิดนครนายก', col:'#f39c2b', s:[2,3], k:'10°C', d:5},
+  {id:'tamarind',n:'มะขามหวานเพชรบูรณ์', e:'🟫', c:'fruit', p:15, farm:'เพชรบูรณ์', col:'#8a5a2b', s:[12,1,2], k:'ที่แห้ง', d:30},
+  {id:'jujube',n:'พุทรานมสด', e:'🟢', c:'fruit', p:8, farm:'สวนพุทราราชบุรี', col:'#d9e8a3', s:[11,12,1,2], k:'5°C', d:10},
+  {id:'avocado',n:'อะโวคาโด (น่าน)', e:'🥑', c:'fruit', p:12, farm:'สวนอะโวคาโดน่าน', col:'#9ab35a', s:[9,10,11], k:'5–8°C', d:7},
+  {id:'persimmon',n:'ลูกพลับ', e:'🟠', c:'fruit', p:12, farm:'ดอยอินทนนท์', col:'#f08a24', s:[10,11,12], k:'0–4°C', d:14},
+  {id:'nashi', n:'สาลี่หิมะ (นำเข้า)', e:'🍐', c:'fruit', p:9, farm:'นำเข้า', col:'#f2edc4', s:[8,9,10,11,12], k:'0–4°C', d:30},
+  {id:'apple', n:'แอปเปิ้ลแดงฟูจิ', e:'🍎', c:'fruit', p:10, farm:'นำเข้า (คัดเกรด)', col:'#e8a87c', s:[1,2,3,4,5,6,7,8,9,10,11,12], k:'0–4°C', d:30},
+  {id:'kiwi',  n:'กีวีเขียว (นำเข้า)', e:'🥝', c:'fruit', p:20, farm:'นำเข้า', col:'#8bbf3f', s:[1,2,3,4,5,6,7,8,9,10,11,12], k:'0–4°C', d:21},
+  {id:'grape', n:'องุ่นเขียวไร้เมล็ด', e:'🍇', c:'fruit', p:18, farm:'ไร่องุ่นราชบุรี', col:'#b5d66b', s:[1,2,3], k:'0–2°C', d:14},
+  {id:'redgrape',n:'องุ่นแดงไร้เมล็ด', e:'🍇', c:'fruit', p:20, farm:'นำเข้า', col:'#8e2f55', s:[1,2,3,4,5,6,7,8,9,10,11,12], k:'0–2°C', d:14},
+  {id:'straw', n:'สตรอว์เบอร์รีพันธุ์ 80', e:'🍓', c:'fruit', p:30, farm:'ดอยสะเก็ด เชียงใหม่', col:'#e0453a', s:[11,12,1,2,3], k:'0–2°C', d:4},
+  {id:'blue',  n:'บลูเบอร์รี (นำเข้า)', e:'🫐', c:'fruit', p:60, farm:'นำเข้า', col:'#3d4a8a', s:[1,2,3,4,5,6,7,8,9,10,11,12], k:'0–2°C', d:10},
+  {id:'pomeg', n:'ทับทิม', e:'🔴', c:'fruit', p:12, farm:'สวนทับทิมเพชรบูรณ์', col:'#9c1c2c', s:[1,2,3,4,5,6,7,8,9,10,11,12], k:'5°C', d:30},
+];
+// สินค้าชิ้น: p = ราคาต่อหน่วย
+const GOODS = [
+  {id:'egg10', n:'ไข่ไก่ เบอร์ 2 (10 ฟอง)', e:'🥚', c:'pantry', p:45, u:'แพ็ก'},
+  {id:'egg30', n:'ไข่ไก่ เบอร์ 2 (แผง 30 ฟอง)', e:'🥚', c:'pantry', p:125, u:'แผง'},
+  {id:'oil1',  n:'น้ำมันพืช (ถั่วเหลือง) 1 ลิตร', e:'🫗', c:'pantry', p:55, u:'ขวด'},
+  {id:'oilpalm',n:'น้ำมันปาล์ม 1 ลิตร', e:'🫗', c:'pantry', p:45, u:'ขวด'},
+  {id:'rice5', n:'ข้าวหอมมะลิ 5 กก.', e:'🍚', c:'pantry', p:210, u:'ถุง'},
+  {id:'ricew5',n:'ข้าวขาว 5% 5 กก.', e:'🍚', c:'pantry', p:165, u:'ถุง'},
+  {id:'ricebr',n:'ข้าวกล้องหอมมะลิ 1 กก.', e:'🌾', c:'pantry', p:65, u:'ถุง'},
+  {id:'fishs', n:'น้ำปลาแท้ 700 มล.', e:'🍶', c:'pantry', p:32, u:'ขวด'},
+  {id:'soy',   n:'ซีอิ๊วขาว 300 มล.', e:'🍶', c:'pantry', p:28, u:'ขวด'},
+  {id:'oyster',n:'ซอสหอยนางรม 300 มล.', e:'🍶', c:'pantry', p:35, u:'ขวด'},
+  {id:'sugar', n:'น้ำตาลทราย 1 กก.', e:'🧂', c:'pantry', p:28, u:'ถุง'},
+  {id:'salt',  n:'เกลือป่น 500 ก.', e:'🧂', c:'pantry', p:12, u:'ถุง'},
+  {id:'coco',  n:'กะทิ 250 มล.', e:'🥥', c:'pantry', p:25, u:'กล่อง'},
+  {id:'phrikpao',n:'น้ำพริกเผา 100 ก.', e:'🫙', c:'pantry', p:30, u:'กระปุก'},
+  {id:'pasteg',n:'พริกแกงเขียวหวาน 100 ก.', e:'🫙', c:'pantry', p:25, u:'ถุง'},
+  {id:'pastes',n:'พริกแกงส้ม 100 ก.', e:'🫙', c:'pantry', p:25, u:'ถุง'},
+  {id:'pastep',n:'พริกแกงเผ็ด 100 ก.', e:'🫙', c:'pantry', p:25, u:'ถุง'},
+  {id:'tofu',  n:'เต้าหู้ไข่ (หลอด)', e:'🧈', c:'pantry', p:15, u:'หลอด'},
+  {id:'woonsen',n:'วุ้นเส้น 40 ก.', e:'🍜', c:'pantry', p:10, u:'ห่อ'},
+  {id:'dish',  n:'น้ำยาล้างจาน 500 มล.', e:'🧴', c:'home', p:35, u:'ขวด'},
+  {id:'veggiewash',n:'น้ำยาล้างผัก 500 มล.', e:'🧴', c:'home', p:59, u:'ขวด'},
+  {id:'trash', n:'ถุงขยะย่อยสลายได้ (30 ใบ)', e:'🗑️', c:'home', p:39, u:'แพ็ก'},
+  {id:'tissue',n:'กระดาษอเนกประสงค์ (2 ม้วน)', e:'🧻', c:'home', p:42, u:'แพ็ก'},
+  {id:'sponge',n:'ฟองน้ำล้างจาน (3 ชิ้น)', e:'🧽', c:'home', p:25, u:'แพ็ก'},
+  {id:'bag',   n:'ถุงผ้าบ้านผัก', e:'👜', c:'home', p:49, u:'ใบ'},
+  {id:'water', n:'น้ำดื่ม 1.5 ลิตร (แพ็ก 6)', e:'💧', c:'home', p:60, u:'แพ็ก'},
+];
+// ชุดพร้อมปรุง: bom = [รหัสวัตถุดิบ, กรัม หรือ จำนวนชิ้น]
+const KITS = [
+  {id:'k-tomyum', n:'ชุดต้มยำน้ำใส', t:'ต้มยำ', e:'🍲🍋🌶️', serv:'2–3 ที่', p:59,
+   bom:[['lemongr',60],['galang',40],['makrut',10],['kinoo',15],['lime',100],['fang',150],['tomato',100],['pakchi',10]],
+   tip:'เพิ่มกุ้งหรือไก่ 300 ก. + น้ำปลา'},
+  {id:'k-tomyumk', n:'ชุดต้มยำน้ำข้น', t:'ต้มยำ', e:'🍲🥥🌶️', serv:'2–3 ที่', p:79,
+   bom:[['lemongr',60],['galang',40],['makrut',10],['kinoo',15],['lime',80],['nangfa',150],['pakchi',10],['phrikpao',0.5]],
+   tip:'เติมนมสดหรือกะทิตามชอบ'},
+  {id:'k-tomkha', n:'ชุดต้มข่า', t:'ต้ม', e:'🥥🫚🍄', serv:'2–3 ที่', p:85,
+   bom:[['galang',80],['lemongr',40],['makrut',10],['kinoo',10],['lime',60],['nangfa',150],['pakchi',10],['coco',1]],
+   tip:'เพิ่มไก่ 300 ก.'},
+  {id:'k-jued', n:'ชุดแกงจืดเต้าหู้วุ้นเส้น', t:'ต้ม', e:'🥣🥬🧈', serv:'2–3 ที่', p:55,
+   bom:[['kadkao',200],['carrot',60],['tonhom',15],['pakchi',10],['garlic',15],['tofu',1],['woonsen',1]],
+   tip:'เพิ่มหมูสับ 200 ก.'},
+  {id:'k-chapchai', n:'ชุดต้มจับฉ่าย', t:'ต้ม', e:'🥬🥕🧄', serv:'3–4 ที่', p:79,
+   bom:[['kadkao',200],['kalam',200],['kana',150],['chaitao',150],['kuenchai',30],['garlic',20]],
+   tip:'เคี่ยวกับซี่โครงหมู 1 ชม.'},
+  {id:'k-kiewwan', n:'ชุดแกงเขียวหวาน', t:'แกง', e:'🍛🥥🌿', serv:'3–4 ที่', p:95,
+   bom:[['praw',150],['puang',50],['horapa',20],['chifah',30],['makrut',5],['pasteg',0.5],['coco',1]],
+   tip:'เพิ่มไก่หรือลูกชิ้นปลา 300 ก.'},
+  {id:'k-som', n:'ชุดแกงส้มผักรวม', t:'แกง', e:'🍛🥬🫛', serv:'3–4 ที่', p:65,
+   bom:[['kalam',150],['tua',100],['chaitao',150],['lime',40],['pastes',0.5]],
+   tip:'เพิ่มปลาหรือกุ้ง 300 ก.'},
+  {id:'k-phed', n:'ชุดแกงป่า/แกงเผ็ด', t:'แกง', e:'🍛🌶️🍆', serv:'3–4 ที่', p:69,
+   bom:[['praw',100],['tua',80],['corn',60],['krachaisoi',30],['chifah',20],['makrut',5],['krapao',20],['pastep',0.5]],
+   tip:'เพิ่มหมูหรือไก่ 300 ก.'},
+  {id:'k-padruam', n:'ชุดผัดผักรวมมิตร', t:'ผัด', e:'🥦🥕🌽', serv:'2–3 ที่', p:59,
+   bom:[['kana',100],['kalam',100],['carrot',60],['corn',80],['nangfa',80],['garlic',20]],
+   tip:'ผัดกับซอสหอยนางรม'},
+  {id:'k-krapao', n:'ชุดผัดกะเพรา', t:'ผัด', e:'🌿🌶️🧄', serv:'2 ที่', p:35,
+   bom:[['krapao',40],['kinoo',20],['garlic',30],['tua',80]],
+   tip:'เพิ่มหมูสับหรือไก่สับ 300 ก.'},
+  {id:'k-bung', n:'ชุดผัดผักบุ้งไฟแดง', t:'ผัด', e:'🌱🧄🔥', serv:'2 ที่', p:35,
+   bom:[['bung',300],['garlic',20],['kinoo',10]],
+   tip:'ใช้ไฟแรง ผัดเร็ว'},
+  {id:'k-kanamoo', n:'ชุดผัดคะน้า', t:'ผัด', e:'🥬🧄🌶️', serv:'2 ที่', p:39,
+   bom:[['kana',300],['garlic',20],['chifah',15]],
+   tip:'เพิ่มหมูกรอบหรือปลาเค็ม'},
+  {id:'k-cha', n:'ชุดผัดฉ่า/ผัดขี้เมา (แพ็กเล็ก)', t:'ผัด', e:'🫚🫛🌶️', serv:'1–2 ที่', p:39,
+   bom:[['krachaisoi',40],['pepper',20],['makrut',5],['chifah',40],['garlic',25],['kinoo',10]],
+   tip:'ผัดกับทะเลหรือหมู 200 ก.'},
+  {id:'k-kruang', n:'ชุดเครื่องต้มยำ (แพ็กเล็ก)', t:'ต้มยำ', e:'🫚🌾🍋', serv:'1 หม้อเล็ก', p:25,
+   bom:[['galang',30],['lemongr',60],['makrut',8],['kinoo',12],['lime',40]],
+   tip:'ใช้ได้ทั้งต้มยำ ต้มข่า ต้มโคล้ง'},
+  // ผลไม้ตัดพร้อมทาน (grp:'cut')
+  {id:'c-melonball', grp:'cut', n:'แตงโมลูกกลม', t:'ผลไม้ตัด', e:'🍉', serv:'กล่อง 300 ก.', p:70, bom:[['melon',300]], tip:'แช่เย็น ทานภายใน 24 ชม.'},
+  {id:'c-cantal', grp:'cut', n:'เมล่อนบอล', t:'ผลไม้ตัด', e:'🍈', serv:'กล่อง 300 ก.', p:80, bom:[['cantal',300]], tip:'แช่เย็น ทานภายใน 24 ชม.'},
+  {id:'c-mix', grp:'cut', n:'ผลไม้รวม Mix Fruits', t:'ผลไม้ตัด', e:'🍓🍈🍇', serv:'กล่อง 350 ก.', p:120,
+   bom:[['melon',80],['cantal',60],['dragon',60],['orange',60],['straw',40],['grape',50]], tip:'ขายดีสุด เหมาะเป็นของฝาก'},
+  {id:'c-papaya', grp:'cut', n:'มะละกอหั่นหยัก', t:'ผลไม้ตัด', e:'🧡', serv:'กล่อง 300 ก.', p:59, bom:[['papaya',300]], tip:'แช่เย็น ทานภายใน 24 ชม.'},
+  {id:'c-orange', grp:'cut', n:'ส้มแกะกลีบ', t:'ผลไม้ตัด', e:'🍊', serv:'กล่อง 280 ก.', p:69, bom:[['orange',280]], tip:'ไร้เมล็ด หวานอมเปรี้ยว'},
+  {id:'c-pomeg', grp:'cut', n:'ทับทิมแกะเม็ด', t:'ผลไม้ตัด', e:'🔴', serv:'กล่องกลม 200 ก.', p:99, bom:[['pomeg',200]], tip:'แกะสดทุกเช้า'},
+  {id:'c-apple', grp:'cut', n:'แอปเปิ้ลหั่นชิ้น', t:'ผลไม้ตัด', e:'🍎', serv:'กล่อง 250 ก.', p:75, bom:[['apple',250]], tip:'แช่น้ำเกลือกันดำ'},
+  {id:'c-pine', grp:'cut', n:'สับปะรดหั่นพร้อมทาน', t:'ผลไม้ตัด', e:'🍍', serv:'กล่อง 300 ก.', p:49, bom:[['pine',300]], tip:'แช่เย็น ทานภายใน 24 ชม.'},
+  {id:'c-guava', grp:'cut', n:'ฝรั่งหั่น + พริกเกลือ', t:'ผลไม้ตัด', e:'🍏', serv:'กล่อง 300 ก.', p:49, bom:[['guava',300]], tip:'แถมพริกเกลือ 1 ซอง'},
+  {id:'c-mamuang', grp:'cut', n:'มะม่วงมันหั่น + พริกเกลือ', t:'ผลไม้ตัด', e:'🥭', serv:'กล่อง 300 ก.', p:59, bom:[['mamuang',300]], tip:'กรอบ มัน แถมพริกเกลือ'},
+  {id:'c-chompu', grp:'cut', n:'ชมพู่ทับทิมจันท์หั่น', t:'ผลไม้ตัด', e:'🔔', serv:'กล่อง 280 ก.', p:69, bom:[['chompu',280]], tip:'กรอบ ฉ่ำน้ำ'},
+  {id:'c-thaimix', grp:'cut', n:'ผลไม้รวมไทย + พริกเกลือ', t:'ผลไม้ตัด', e:'🍏🥭🍉', serv:'กล่อง 330 ก.', p:79, bom:[['guava',80],['mamuang',70],['chompu',60],['pine',60],['melon',60]], tip:'ขายดีช่วงบ่าย'},
+  {id:'c-pomelo', grp:'cut', n:'ส้มโอทับทิมสยามแกะกลีบ', t:'ผลไม้ตัด', e:'🟢', serv:'กล่อง 300 ก.', p:99, bom:[['pomelo',300]], tip:'แกะเยื่อออกหมด'},
+  {id:'c-durian', grp:'cut', n:'ทุเรียนหมอนทองแกะเนื้อ', t:'ผลไม้ตัด', e:'🟡', serv:'กล่อง 250 ก.', p:299, bom:[['durian',250]], tip:'2–3 พู สุกกำลังดี'},
+  {id:'c-jack', grp:'cut', n:'ขนุนแกะเนื้อ', t:'ผลไม้ตัด', e:'🟨', serv:'กล่อง 250 ก.', p:69, bom:[['jack',250]], tip:'หอม หวาน กรอบ'},
+  {id:'c-mangosteen', grp:'cut', n:'มังคุดแกะพร้อมทาน', t:'ผลไม้ตัด', e:'🟣', serv:'กล่อง 250 ก.', p:129, bom:[['mangosteen',250]], tip:'ไม่เลอะมือ'},
+  {id:'c-taengthai', grp:'cut', n:'แตงไทยหั่น', t:'ผลไม้ตัด', e:'🍈', serv:'กล่อง 300 ก.', p:45, bom:[['taengthai',300]], tip:'ทานกับน้ำแข็งไส'},
+  {id:'c-duo', grp:'cut', n:'คู่หูแตงโม-เมล่อนลูกกลม', t:'ผลไม้ตัด', e:'🍉🍈', serv:'กล่อง 300 ก.', p:75, bom:[['melon',150],['cantal',150]], tip:'สีสวย ถ่ายรูปขึ้น'},
+  {id:'c-reddragon', grp:'cut', n:'แก้วมังกรแดงลูกกลม', t:'ผลไม้ตัด', e:'🐉', serv:'กล่อง 280 ก.', p:79, bom:[['dragonred',280]], tip:'สีสวยเด่น'},
+  {id:'c-berry', grp:'cut', n:'เบอร์รีรวม Berry Mix', t:'ผลไม้ตัด', e:'🍓🫐🍇', serv:'กล่อง 240 ก.', p:159, bom:[['straw',100],['blue',60],['redgrape',80]], tip:'ทานกับโยเกิร์ต'},
+  {id:'c-cup', grp:'cut', n:'ฟรุตคัพ (แก้วเล็ก)', t:'ผลไม้ตัด', e:'🥤', serv:'แก้ว 190 ก.', p:39, pack:3, bom:[['melon',60],['cantal',50],['pine',50],['grape',30]], tip:'พร้อมส้อมจิ้ม'},
+  {id:'c-skewer', grp:'cut', n:'ผลไม้เสียบไม้ (5 ไม้)', t:'ผลไม้ตัด', e:'🍢', serv:'5 ไม้ 300 ก.', p:89, labor:10, bom:[['straw',60],['melon',80],['cantal',60],['grape',50],['pine',50]], tip:'เหมาะงานปาร์ตี้'},
+  {id:'c-mango', grp:'cut', n:'มะม่วงน้ำดอกไม้หั่น', t:'ผลไม้ตัด', e:'🥭', serv:'กล่อง 250 ก.', p:79, bom:[['mango',250]], tip:'สุกพอดี ทานภายในวัน'},
+  // ถาดผลไม้จัดแต่ง / กระเช้า (grp:'deco')
+  {id:'d-trayS', grp:'deco', n:'ถาดผลไม้จัดเลี้ยง S (4–6 ท่าน)', t:'จัดแต่ง', e:'🍉🍍🍇', serv:'ถาด 1.4 กก.', p:299, pack:18, labor:25,
+   bom:[['melon',300],['cantal',250],['pine',250],['dragon',200],['grape',150],['straw',100],['orange',200]], tip:'สั่งก่อน 10 โมง รับบ่ายวันเดียวกัน'},
+  {id:'d-trayL', grp:'deco', n:'ถาดผลไม้จัดเลี้ยง L (10–15 ท่าน)', t:'จัดแต่ง', e:'🍉🍈🍓', serv:'ถาด 3.4 กก.', p:690, pack:35, labor:50,
+   bom:[['melon',700],['cantal',550],['pine',550],['dragon',450],['grape',350],['straw',250],['orange',400],['guava',150]], tip:'งานประชุม งานเลี้ยงบริษัท'},
+  {id:'d-carve', grp:'deco', n:'ถาดผลไม้แกะสลัก', t:'จัดแต่ง', e:'🌺🍉🥭', serv:'ถาด 1.7 กก.', p:590, pack:25, labor:150,
+   bom:[['melon',600],['cantal',400],['papaya',300],['chompu',200],['mamuang',200]], tip:'แกะลายดอกไม้ สั่งล่วงหน้า 1 วัน'},
+  {id:'d-bouquet', grp:'deco', n:'ช่อผลไม้ Fruit Bouquet', t:'จัดแต่ง', e:'💐🍓🍇', serv:'ช่อ 0.8 กก.', p:450, pack:45, labor:60,
+   bom:[['straw',300],['grape',200],['blue',125],['pine',150]], tip:'ของขวัญวันเกิด รับปริญญา'},
+  {id:'d-gift2', grp:'deco', n:'กล่องของขวัญ Premium Mix 2 ชั้น', t:'จัดแต่ง', e:'🎁🍈🍓', serv:'2 กล่อง 700 ก.', p:359, pack:25, labor:25,
+   bom:[['melon',150],['cantal',150],['dragon',100],['straw',80],['grape',100],['blue',40],['orange',80]], tip:'ใส่ถุงผ้าพร้อมการ์ด'},
+  {id:'d-basket', grp:'deco', whole:true, n:'กระเช้าผลไม้ของขวัญ (ทั้งลูก)', t:'กระเช้า', e:'🍎🍐🍊', serv:'กระเช้า 3.2 กก.', p:890, pack:120, labor:40,
+   bom:[['apple',600],['nashi',600],['persimmon',400],['orange',800],['redgrape',500],['kiwi',300]], tip:'ปีใหม่ ไหว้ผู้ใหญ่ เยี่ยมไข้'},
+  {id:'d-thaibasket', grp:'deco', whole:true, n:'กระเช้าผลไม้ไทยตามฤดูกาล', t:'กระเช้า', e:'🍊🟢🍌', serv:'กระเช้า 3 กก.', p:690, pack:100, labor:40,
+   bom:[['orange',800],['pomelo',1200],['sapodilla',400],['kluaikhai',300],['guava',300]], tip:'ผลไม้ไทยตามฤดู ช่วยเกษตรกรไทย'},
+];
+
+/* ภาพสินค้า (สร้างด้วย Canva) — ไฟล์อยู่ในโฟลเดอร์ img/ */
+const IMG = ["apple", "avocado", "banana", "blue", "brocc", "buab", "bung", "bungthai", "button", "cantal", "carrot", "cauli", "chaitao", "chaom", "chifah", "chompu", "corn", "cos", "cuke", "custard", "dragon", "dragonred", "durian", "eggpl", "eryngii", "fakkhiao", "fang", "galang", "garlic", "ginger", "gingersoi", "grape", "greenoak", "guava", "hom", "hongtae", "horapa", "huhnu", "iceberg", "jack", "jujube", "kadkao", "kalam", "kalammuang", "kale", "kana", "kanahk", "kemtong", "khae", "kinoo", "kiwi", "kluaikhai", "krachai", "krachaisoi", "krapao", "kuenchai", "kwang", "lantao", "lemongr", "lime", "longan", "longkong", "lychee", "makrut", "mamuang", "mandarin", "mango", "mangosteen", "mara", "marakn", "mayong", "melon", "namtao", "namwa", "nangfa", "nangrom", "nashi", "okra", "onion", "orange", "pakchi", "papaya", "pepper", "persimmon", "phakwan", "pine", "pomeg", "pomelo", "potato", "puang", "pumpjp", "pumpk", "rambutan", "redgrape", "redoak", "rocket", "salad", "salak", "sapodilla", "shallot", "shimeji", "starfruit", "straw", "taengran", "taengthai", "tamarind", "tamlueng", "tomato", "tonhom", "tua", "tuaphu", "zucchini"];
+/* รูปที่ผู้ดูแลอัปโหลด/ถ่ายเอง (เก็บในเบราว์เซอร์นี้) — มาก่อนรูป Canva */
+let PHOTOS = {}; try{ PHOTOS = JSON.parse(localStorage.getItem('bp_photos')||'{}'); }catch(e){}
+function savePhotos(){ try{ localStorage.setItem('bp_photos', JSON.stringify(PHOTOS)); return true; }catch(e){ return false; } }
+const photoOf = id => PHOTOS[id] || (IMG.includes(id) ? 'img/'+id+'.png' : null);
+/* ============ HELPERS ============ */
+const byId = {}; [...VEG,...GOODS].forEach(x=>byId[x.id]=x);
+const baht = v => '฿' + (Math.round(v*100)/100).toLocaleString('th-TH',{maximumFractionDigits:2});
+const isVeg = id => VEG.some(v=>v.id===id);
+function bomLabel([id,q]){
+  const it = byId[id]; if(!it) return id;
+  return isVeg(id) ? `${it.n} <b>${q} ก.</b>` : `${it.n.split(' ')[0]} <b>${q<1?'½':q} ${it.u}</b>`;
+}
+const $ = s => document.querySelector(s);
+let toastT; function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),1600)}
+
+/* ============ STATE ============ */
+let cart = {};          // key -> qty   (veg: qty in 100g units)
+let pick = {};          // veg chosen grams before adding (in 100g units)
+let curCat = 'all', query = '';
+
+/* ============ SHOP RENDER ============ */
+function renderCats(){
+  const all = [{id:'all',name:'ทั้งหมด'},...CATS];
+  $('#cats').innerHTML = all.map(c=>`<button class="tab ${c.id===curCat?'on':''}" data-c="${c.id}">${c.name}</button>`).join('');
+}
+const today = new Date();
+const dmy = d => d.getDate().toString().padStart(2,'0')+'/'+(d.getMonth()+1).toString().padStart(2,'0');
+const addD = n => { const d=new Date(today); d.setDate(d.getDate()+n); return d; };
+const netG = k => k.bom.reduce((s,[id,q])=>s+(isVeg(id)?q:0),0);
+const lotOf = k => 'BP'+dmy(today).replace('/','')+'-'+String(KITS.indexOf(k)+1).padStart(2,'0');
+function trayHTML(k){
+  const lot = lotOf(k);
+  const label = k.grp==='deco' ? `<div class="lbl"><b>บ้านผัก</b>${k.serv}<br>จัดสดตามออเดอร์<br>${k.t==='กระเช้า'?'🎀 ผูกโบว์+การ์ด':'🧊 แช่เย็น 0–4°C'}</div>` : `<div class="lbl"><b>บ้านผัก</b>${k.n.replace(/ \(.*\)/,'')}<br>สุทธิ ${netG(k)} ก. · LOT ${lot}<br>ผลิต ${dmy(today)} · หมดอายุ ${dmy(addD(k.grp==='cut'?1:2))}<div class="bc"></div></div>`;
+  if(k.grp==='cut' || (k.grp==='deco' && !k.whole)){
+    const tot = netG(k); let balls='';
+    for(const [id,q] of k.bom){ const n=Math.max(3,Math.round(q/tot*36)); const c=byId[id].col||'#ddd';
+      for(let i=0;i<n;i++) balls+=`<i style="background:${c}${id==='dragon'?';background-image:radial-gradient(#222 1px,transparent 1.5px);background-size:6px 6px':''}"></i>`; }
+    return `<div class="tray clear ${k.id==='c-pomeg'?'round':''} ${k.grp==='deco'?'deco':''}"><div class="balls ${k.id==='c-pomeg'?'tiny':''}">${balls}</div>${label}</div>`;
+  }
+  const em = k.bom.map(([id])=>`<span>${byId[id].e}</span>`).join('');
+  if(k.whole) return `<div class="tray basket"><div class="items">${em}${em}</div>${label}</div>`;
+  return `<div class="tray ${k.p<30?'dark':''}"><div class="items">${em}</div>${label}</div>`;
+}
+const TM = ['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const inSeason = v => !!(v.s && v.s.includes(today.getMonth()+1));
+const seasonTxt = s => s.length===12 ? 'ทั้งปี' : TM[s[0]]+(s.length>1?'–'+TM[s[s.length-1]]:'');
+let calM = today.getMonth()+1;
+const calHTML = m => VEG.filter(v=>v.c==='fruit'&&v.s&&v.s.length<12&&v.s.includes(m)).map(v=>`<i>${v.e} ${v.n}</i>`).join('') || '<i>—</i>';
+function seasonStrip(){
+  return `<div class="season"><b>🗓️ ปฏิทินผลไม้ไทย</b> <span class="meta">กดเลือกเดือนเพื่อดูผลไม้ที่อยู่ในฤดู</span><div class="cal">${TM.slice(1).map((t,i)=>`<button class="${i+1===calM?'on':''}" data-cal="${i+1}">${t}</button>`).join('')}</div><div id="calOut">${calHTML(calM)}</div></div>`;
+}
+function kitCard(k){
+  return `<div class="card kit" style="position:relative">
+    ${photoOf(k.id)?`<img class="photo" src="${photoOf(k.id)}" alt="${k.n}" loading="lazy">`:trayHTML(k)}<span class="ktype">${k.t}</span>
+    <div class="row"><h3>${k.n}</h3></div>
+    <div class="serv">${k.grp==='deco'?'🎁 '+k.serv+' · '+k.bom.length+' ชนิด':k.grp==='cut'?'🥄 '+k.serv+' · ปอก หั่น แพ็กสดวันนี้':'🍽️ '+k.serv+' · สุทธิ '+netG(k)+' ก. · ล้าง/เตรียมแล้ว'}</div>
+    <ul>${k.bom.map(b=>`<li>${bomLabel(b)}</li>`).join('')}</ul>
+    <div class="meta">💡 ${k.tip}</div>
+    <div class="row" style="margin-top:auto"><span class="price">${baht(k.p)} <small>/ชุด</small></span>
+      <button class="btn sm" style="margin-left:auto" data-add="${k.id}">+ ใส่ตะกร้า</button></div>
+  </div>`;
+}
+function vegCard(v){
+  const u = pick[v.id] || 1;
+  return `<div class="card">
+    ${photoOf(v.id)?`<img class="photo" src="${photoOf(v.id)}" alt="${v.n}" loading="lazy">`:`<div class="thumb">${v.e}</div>`}
+    <h3>${v.n}</h3>
+    ${v.prep?'<span class="tag">🔪 ปอก ล้าง ซอยแล้ว</span>':''}
+    ${v.s?`<div class="meta">${inSeason(v)?'<span class="tag farm">🟢 อยู่ในฤดู</span>':'<span class="tag">นอกฤดู</span>'} ฤดู ${seasonTxt(v.s)}<br>🧊 เก็บ ${v.k} · อยู่ได้ ~${v.d} วัน</div>`:''}
+    <div class="price">${baht(v.p)} <small>/100 ก. · ${baht(v.p*10)}/กก.</small></div>
+    <div class="row"><div class="qty"><button data-dec="${v.id}">−</button><span>${u*100>=1000?(u/10)+' กก.':u*100+' ก.'}</span><button data-inc="${v.id}">+</button></div></div>
+    <button class="btn sm full" data-add="${v.id}">ใส่ตะกร้า ${baht(v.p*u)}</button>
+  </div>`;
+}
+function goodCard(g){
+  return `<div class="card">
+    ${photoOf(g.id)?`<img class="photo" src="${photoOf(g.id)}" alt="${g.n}" loading="lazy">`:`<div class="thumb" style="background:var(--cream)">${g.e}</div>`}
+    <h3>${g.n}</h3>
+    <div class="price">${baht(g.p)} <small>/${g.u}</small></div>
+    <button class="btn sm full" style="margin-top:auto" data-add="${g.id}">+ ใส่ตะกร้า</button>
+  </div>`;
+}
+function renderShop(){
+  const q = query.trim();
+  const match = x => !q || x.n.includes(q) || (x.t||'').includes(q);
+  let html = '';
+  const cats = curCat==='all' ? CATS : CATS.filter(c=>c.id===curCat);
+  for(const c of cats){
+    let items, fn, cls='grid';
+    if(['kit','cut','deco'].includes(c.id)){ items = KITS.filter(k=>(k.grp||'kit')===c.id && match(k)); fn = kitCard; cls='grid kits'; }
+    else if(['pantry','home'].includes(c.id)){ items = GOODS.filter(g=>g.c===c.id && match(g)); fn = goodCard; }
+    else { items = VEG.filter(v=>v.c===c.id && match(v)); fn = vegCard; if(c.id==='fruit') items.sort((a,b)=>inSeason(b)-inSeason(a)); }
+    if(!items.length) continue;
+    const sub = c.id==='deco' ? 'จัดตามออเดอร์ งานเลี้ยง/ของขวัญ' : c.id==='fruit' ? 'ขายเป็นขีด · ป้ายเขียว = อยู่ในฤดู' : c.id==='cut' ? 'ปอก หั่น แช่เย็น พร้อมทาน' : c.id==='kit' ? 'เตรียมสด ล้าง หั่น ชั่งให้แล้ว' : (['pantry','home'].includes(c.id) ? 'ราคาต่อชิ้น' : 'ขายเป็นขีด (100 ก.)');
+    html += `<div class="sec-h"><h2>${c.name}</h2><span>${items.length} รายการ · ${sub}</span></div>${c.id==='fruit'?seasonStrip():''}<div class="${cls}">${items.map(fn).join('')}</div>`;
+  }
+  $('#shopBody').innerHTML = html || '<div class="empty">ไม่พบสินค้า</div>';
+}
+
+/* ============ CART ============ */
+function itemOf(key){ return KITS.find(k=>k.id===key) || byId[key]; }
+function linePrice(key,q){ const it=itemOf(key); return it.p*q; }
+function lineDesc(key,q){
+  if(KITS.find(k=>k.id===key)) return `${q} ชุด × ${baht(itemOf(key).p)}`;
+  if(isVeg(key)) return `${q*100} ก. (${baht(itemOf(key).p)}/100 ก.)`;
+  return `${q} ${itemOf(key).u} × ${baht(itemOf(key).p)}`;
+}
+function addToCart(key){
+  const q = isVeg(key) ? (pick[key]||1) : 1;
+  cart[key] = (cart[key]||0) + q;
+  toast('เพิ่ม ' + itemOf(key).n + ' แล้ว');
+  renderCart();
+}
+let noBag = true, slot = 'วันนี้ 16:00–18:00';
+function renderCart(){
+  const keys = Object.keys(cart).filter(k=>cart[k]>0);
+  $('#cartCount').textContent = keys.length;
+  if(!keys.length){ $('#citems').innerHTML = '<div class="empty">🧺 ยังไม่มีสินค้าในตะกร้า</div>'; $('#cfoot').innerHTML=''; return; }
+  $('#citems').innerHTML = keys.map(k=>{const it=itemOf(k);return `<div class="ci">
+    <div class="e">${it.e.slice(0,2)}</div>
+    <div class="n">${it.n}<div>${lineDesc(k,cart[k])}</div></div>
+    <div class="qty"><button data-cdec="${k}">−</button><span>${baht(linePrice(k,cart[k]))}</span><button data-cinc="${k}">+</button></div>
+  </div>`}).join('');
+  const sub = keys.reduce((s,k)=>s+linePrice(k,cart[k]),0);
+  const ship = sub>=300 ? 0 : 30;
+  const pts = Math.floor(sub/25) + (noBag?10:0);
+  $('#cfoot').innerHTML = `
+    <div class="l"><span>ยอดสินค้า</span><span>${baht(sub)}</span></div>
+    <div class="l"><span>ค่าส่ง ${ship?'<small>(ฟรีเมื่อครบ ฿300)</small>':''}</span><span>${ship?baht(ship):'ฟรี'}</span></div>
+    <label class="chk"><input type="checkbox" id="nobag" ${noBag?'checked':''}> 🌍 ไม่รับถุงพลาสติก (+10 แต้มรักษ์โลก)</label>
+    <select id="slot">${['วันนี้ 16:00–18:00','วันนี้ 18:00–20:00','พรุ่งนี้ 07:00–09:00','พรุ่งนี้ 10:00–12:00','รับเองที่ร้าน'].map(s=>`<option ${s===slot?'selected':''}>${s}</option>`).join('')}</select>
+    <div class="l"><span>แต้มที่จะได้รับ</span><span>🌱 ${pts} แต้ม</span></div>
+    <div class="l t"><span>รวมทั้งสิ้น</span><span>${baht(sub+ship)}</span></div>
+    <button class="btn full" id="checkout" style="margin-top:8px">ยืนยันคำสั่งซื้อ (ตัวอย่าง)</button>`;
+}
+function openCart(o){ $('#drawer').classList.toggle('on',o); $('#mask').classList.toggle('on',o); }
+
+/* ============ EVENTS ============ */
+document.addEventListener('click',e=>{
+  const t = e.target.closest('button'); if(!t) return;
+  const d = t.dataset;
+  if(d.c){ curCat=d.c; renderCats(); renderShop(); }
+  else if(d.inc){ pick[d.inc]=(pick[d.inc]||1)+1; renderShop(); }
+  else if(d.dec){ pick[d.dec]=Math.max(1,(pick[d.dec]||1)-1); renderShop(); }
+  else if(d.add){ addToCart(d.add); }
+  else if(d.cinc){ cart[d.cinc]++; renderCart(); }
+  else if(d.cdec){ cart[d.cdec]--; if(cart[d.cdec]<=0) delete cart[d.cdec]; renderCart(); }
+  else if(d.v){ document.querySelectorAll('#views button').forEach(b=>b.classList.toggle('on',b===t));
+    ['shop','pos','back','dash'].forEach(v=>$('#v-'+v).hidden = v!==d.v); if(d.v==='pos') renderPos(); else { const fb=$('#posFab'); if(fb) fb.classList.remove('on'); } window.scrollTo(0,0); }
+  else if(t.id==='cartBtn') openCart(true);
+  else if(t.id==='closeCart') openCart(false);
+  else if(t.id==='checkout'){ cart={}; renderCart(); openCart(false); toast('✅ รับคำสั่งซื้อแล้ว (ตัวอย่าง) · รอบส่ง '+slot); }
+});
+$('#mask').onclick=()=>openCart(false);
+document.addEventListener('change',e=>{
+  if(e.target.id==='nobag'){ noBag=e.target.checked; renderCart(); }
+  if(e.target.id==='slot'){ slot=e.target.value; }
+});
+$('#q').addEventListener('input',e=>{ query=e.target.value; renderShop(); });
+
+/* ============ BACK OFFICE ============ */
+const LOSS = {leaf:15, fruitveg:8, root:10, herb:20, mush:8, fruit:12}; // % เผื่อปอก/หั่น/คัดทิ้ง
+VEG.forEach(v=>{ v.cost = Math.round(v.p*0.62*100)/100; v.loss = LOSS[v.c]; });
+Object.entries({gingersoi:3,krachaisoi:3,melon:45,cantal:45,pine:45,papaya:30,orange:35,pomeg:50,dragon:35,dragonred:35,apple:15,grape:5,redgrape:5,blue:3,straw:8,mango:35,mamuang:30,banana:35,kluaikhai:35,namwa:35,pepper:15,guava:12,chompu:8,pomelo:55,durian:70,jack:5,mangosteen:65,taengthai:40,mandarin:30,rambutan:50,longan:40,lychee:45,longkong:40,salak:40,sapodilla:20,custard:50,starfruit:10,mayong:30,tamarind:40,jujube:10,avocado:30,persimmon:10,nashi:15,kiwi:15,cauli:30,brocc:35,sato:0,ngok:5,bamboo:10,taro:20,sweetpot:15,purplepot:15,beet:15,fakkhiao:25,pumpjp:25})
+  .forEach(([id,l])=>byId[id].loss=l);
+GOODS.forEach(g=>{ g.cost = Math.round(g.p*0.85*100)/100; });
+let shock = 0, packC = 4, laborC = 6, targetM = 35, backCat = 'all', openKit = null;
+
+function kitCost(k){
+  let raw = 0, farm = 0; const lines = [];
+  for(const [id,q] of k.bom){
+    const it = byId[id];
+    if(isVeg(id)){
+      const g = k.whole ? q : q*(1+it.loss/100);               // กรัมที่ต้องใช้จริงรวมส่วนสูญเสีย
+      const c = g/100 * it.cost * (1+shock/100);
+      raw += c; farm += c;
+      lines.push({n:it.n, q:k.whole?`${q} ก. (ทั้งลูก)`:`${q} ก. → ใช้จริง ${Math.round(g)} ก. (เผื่อ ${it.loss}%)`, c});
+    } else {
+      const c = q*it.cost; raw += c;
+      lines.push({n:it.n, q:`${q<1?'½':q} ${it.u}`, c});
+    }
+  }
+  const pk = k.pack ?? packC, lb = k.labor ?? laborC;
+  const total = raw + pk + lb;
+  const profit = k.p - total;
+  return {raw, farm, total, pk, lb, profit, m: profit/k.p*100, sug: Math.ceil(total/(1-targetM/100)), share: farm/k.p*100, lines};
+}
+const mgCls = m => m>=targetM ? 'g' : (m>=targetM-10 ? 'y' : 'r');
+
+function renderBack(){
+  $('#shockV').textContent = (shock>0?'+':'')+shock+'%';
+  const rows = KITS.map(k=>({k, c:kitCost(k)}));
+  const avg = rows.reduce((s,r)=>s+r.c.m,0)/rows.length;
+  const below = rows.filter(r=>r.c.m<targetM).length;
+  const share = rows.reduce((s,r)=>s+r.c.share,0)/rows.length;
+  const best = rows.slice().sort((a,b)=>b.c.profit-a.c.profit)[0];
+  $('#backKpi').innerHTML = `
+    <div class="kpi"><div>กำไรเฉลี่ยต่อชุด</div><b style="color:${avg>=targetM?'var(--green)':'var(--red)'}">${avg.toFixed(1)}%</b></div>
+    <div class="kpi"><div>ชุดที่ต่ำกว่าเป้า</div><b>${below} / ${rows.length}</b></div>
+    <div class="kpi"><div>ส่วนแบ่งถึงเกษตรกร (เฉลี่ย)</div><b>${share.toFixed(1)}%</b></div>
+    <div class="kpi"><div>ชุดกำไรสูงสุด</div><b style="font-size:15px">${best.k.n}<br>${baht(best.c.profit)}/ชุด</b></div>`;
+  let h = `<tr><th>ชุดพร้อมปรุง</th><th class="r">ราคาขาย</th><th class="r">วัตถุดิบ</th><th class="r">ต้นทุนรวม</th><th class="r">กำไร/ชุด</th><th class="r">% กำไร</th><th class="r">ราคาแนะนำ</th><th class="r">ถึงเกษตรกร</th></tr>`;
+  for(const {k,c} of rows){
+    h += `<tr class="k" data-kit="${k.id}"><td>${openKit===k.id?'▾':'▸'} ${k.n} <span class="meta">· ${k.t}</span></td>
+      <td class="r"><input class="in" type="number" step="1" data-kp="${k.id}" value="${k.p}"></td>
+      <td class="r">${baht(c.raw)}</td><td class="r">${baht(c.total)}</td>
+      <td class="r" style="color:${c.profit<0?'var(--red)':'inherit'}">${baht(c.profit)}</td>
+      <td class="r"><span class="mg ${mgCls(c.m)}">${c.m.toFixed(0)}%</span></td>
+      <td class="r">${c.sug>k.p?'⬆️ ':''}${baht(c.sug)}</td>
+      <td class="r">${c.share.toFixed(0)}%</td></tr>`;
+    if(openKit===k.id){
+      h += `<tr class="det"><td colspan="8"><table>${c.lines.map(l=>`<tr><td>${l.n}</td><td>${l.q}</td><td class="r">${baht(l.c)}</td></tr>`).join('')}
+        <tr><td>บรรจุภัณฑ์ + ค่าแรงเตรียม/จัดแต่ง</td><td></td><td class="r">${baht(c.pk+c.lb)}</td></tr>
+        <tr><td><b>ต้นทุนรวม</b></td><td></td><td class="r"><b>${baht(c.total)}</b></td></tr></table></td></tr>`;
+    }
+  }
+  $('#kitTbl').innerHTML = h;
+  // veg table
+  const vc = [{id:'all',name:'ทั้งหมด'},...CATS.filter(c=>LOSS[c.id]!==undefined)];
+  $('#backCats').innerHTML = vc.map(c=>`<button class="tab ${c.id===backCat?'on':''}" data-bc="${c.id}">${c.name}</button>`).join('');
+  const list = VEG.filter(v=>backCat==='all'||v.c===backCat);
+  let vh = `<tr><th>วัตถุดิบ</th><th>สวนต้นทาง</th><th class="r">ทุน/100 ก.</th><th class="r">ขาย/100 ก.</th><th class="r">% สูญเสีย</th><th class="r">ทุนจริงหลังสูญเสีย</th><th>กำไรขั้นต้น</th><th></th></tr>`;
+  for(const v of list){
+    const real = v.cost*(1+shock/100)*(1+v.loss/100);
+    const m = (v.p-real)/v.p*100;
+    vh += `<tr><td>${v.e} ${v.n}</td><td class="meta">${v.farm}</td>
+      <td class="r"><input class="in" type="number" step="0.1" data-vc="${v.id}" value="${v.cost}"></td>
+      <td class="r"><input class="in" type="number" step="0.5" data-vp="${v.id}" value="${v.p}"></td>
+      <td class="r"><input class="in" style="width:56px" type="number" step="1" data-vl="${v.id}" value="${v.loss}"></td>
+      <td class="r">${baht(real)}</td>
+      <td><div class="row"><div class="bar"><i style="width:${Math.max(0,Math.min(100,m))}%;background:${m<15?'var(--red)':'var(--green2)'}"></i></div><span class="mg ${m>=25?'g':m>=15?'y':'r'}">${m.toFixed(0)}%</span></div></td><td>${v.custom?`<button class="btn sm ghost" data-delp="${v.id}">ลบ</button>`:''}</td></tr>`;
+  }
+  $('#vegTbl').innerHTML = vh;
+}
+document.addEventListener('click',e=>{
+  const bc = e.target.closest('[data-bc]'); if(bc){ backCat=bc.dataset.bc; renderBack(); return; }
+  const tr = e.target.closest('tr.k'); if(tr && !e.target.closest('input')){ openKit = openKit===tr.dataset.kit?null:tr.dataset.kit; renderBack(); }
+});
+document.addEventListener('change',e=>{
+  const d = e.target.dataset, v = parseFloat(e.target.value);
+  if(isNaN(v)) return;
+  if(d.kp){ KITS.find(k=>k.id===d.kp).p = v; }
+  else if(d.vc){ byId[d.vc].cost = v; }
+  else if(d.vp){ byId[d.vp].p = v; renderShop(); }
+  else if(d.vl){ byId[d.vl].loss = v; }
+  else if(e.target.id==='packC') packC=v;
+  else if(e.target.id==='laborC') laborC=v;
+  else if(e.target.id==='targetM') targetM=v;
+  else return;
+  renderBack(); renderShop(); renderCart();
+});
+$('#shock').addEventListener('input',e=>{ shock=+e.target.value; renderBack(); });
+
+/* ============ DASHBOARD ============ */
+let seed = 7; const rnd = () => (seed = (seed*16807) % 2147483647) / 2147483647;
+const ALLP = [...KITS, ...VEG, ...GOODS];
+const DAYS = [];
+for(let i=29;i>=0;i--){
+  const d = addD(-i), wk = [0,6].includes(d.getDay()) ? 1.35 : 1;
+  const items = {};
+  for(const k of KITS) items[k.id] = k.grp==='deco' ? Math.round(rnd()*3*wk) : Math.round((k.grp==='cut'? 6+rnd()*14 : (k.p<40?10+rnd()*20:5+rnd()*15))*wk);
+  for(const v of VEG) items[v.id] = Math.round((v.c==='fruit'?(v.s&&!inSeason(v)?2:6):5 + rnd()*20)*wk*(0.6+rnd()*0.8)); // หน่วยละ 100 ก.
+  for(const g of GOODS) items[g.id] = Math.round((1+rnd()*(g.c==='pantry'?7:4))*wk);
+  DAYS.push({d, items, waste: 0.04+rnd()*0.05});
+}
+let range = 30;
+function unitCost(id){
+  const k = KITS.find(x=>x.id===id); if(k) return kitCost(k).total;
+  const it = byId[id]; return isVeg(id) ? it.cost*(1+shock/100) : it.cost;
+}
+function farmPart(id){ const k=KITS.find(x=>x.id===id); if(k) return kitCost(k).farm; return isVeg(id)? byId[id].cost*(1+shock/100)*(1+byId[id].loss/100) : 0; }
+const groupOf = id => { const k=KITS.find(x=>x.id===id); if(k) return k.grp==='deco'?'ถาดจัดแต่ง/กระเช้า':k.grp==='cut'?'ผลไม้ตัดพร้อมทาน':'ชุดพร้อมปรุง'; return isVeg(id)?(byId[id].c==='fruit'?'ผลไม้สด':'ผักสด (ขายเป็นขีด)'):(byId[id].c==='home'?'ของใช้ในบ้าน':'ข้าว ไข่ น้ำมัน เครื่องปรุง'); };
+const fmt = v => '฿'+Math.round(v).toLocaleString('th-TH');
+function renderDash(){
+  const days = DAYS.slice(-range); const per = []; const byP = {}; const byG = {}; const byF = {};
+  let R=0,C=0,W=0,F=0;
+  for(const day of days){
+    let r=0,c=0;
+    for(const [id,u] of Object.entries(day.items)){
+      const it = KITS.find(x=>x.id===id)||byId[id]; if(!it) continue; const rv=u*it.p, cv=u*unitCost(id);
+      r+=rv; c+=cv;
+      byP[id] = byP[id]||{u:0,r:0,c:0}; byP[id].u+=u; byP[id].r+=rv; byP[id].c+=cv;
+      byG[groupOf(id)] = (byG[groupOf(id)]||0)+rv;
+      const fp = u*farmPart(id); F+=fp;
+      // แจกเงินถึงสวน
+      const bom = KITS.find(x=>x.id===id)?.bom || (isVeg(id)?[[id,100]]:[]);
+      const tot = bom.reduce((s,[b,q])=>s+(isVeg(b)?q*byId[b].cost:0),0)||1;
+      for(const [b,q] of bom) if(isVeg(b)) byF[byId[b].farm]=(byF[byId[b].farm]||0)+fp*(q*byId[b].cost/tot);
+    }
+    const w = c*day.waste; W+=w; R+=r; C+=c+w;
+    per.push({d:day.d, r, p:r-c-w});
+  }
+  const P=R-C;
+  $('#dKpi').innerHTML = `
+    <div class="kpi"><div>ยอดขาย ${range} วัน</div><b>${fmt(R)}</b><small>เฉลี่ย ${fmt(R/range)}/วัน</small></div>
+    <div class="kpi"><div>ต้นทุนรวม (รวมของเสีย)</div><b>${fmt(C)}</b><small>วัตถุดิบ แพ็ก ค่าแรง</small></div>
+    <div class="kpi"><div>กำไรขั้นต้น</div><b style="color:var(--green)">${fmt(P)}</b><small>${(P/R*100).toFixed(1)}% ของยอดขาย</small></div>
+    <div class="kpi"><div>มูลค่าของเสีย</div><b style="color:var(--red)">${fmt(W)}</b><small>${(W/(C-W)*100).toFixed(1)}% ของต้นทุน</small></div>
+    <div class="kpi"><div>จ่ายถึงเกษตรกร</div><b>${fmt(F)}</b><small>${(F/R*100).toFixed(1)}% ของยอดขาย</small></div>`;
+  // line chart
+  const Wd=(window.innerWidth<600?360:640),Ht=(window.innerWidth<600?240:230),pl=46,pr=14,pt=14,pb=26, max=Math.max(...per.map(x=>x.r))*1.1;
+  const x = i => pl + i*(Wd-pl-pr)/(per.length-1), y = v => pt + (1-v/max)*(Ht-pt-pb);
+  const path = k => per.map((o,i)=>(i?'L':'M')+x(i).toFixed(1)+','+y(o[k]).toFixed(1)).join('');
+  let g=''; const step = max>20000?5000:max>8000?2000:1000;
+  for(let v=0; v<=max; v+=step) g+=`<line x1="${pl}" x2="${Wd-pr}" y1="${y(v)}" y2="${y(v)}" stroke="#ece9de"/><text x="${pl-6}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="#8a9183">${v>=1000?(v/1000)+'k':v}</text>`;
+  const every = Math.ceil(per.length/(Wd<400?4:7));
+  per.forEach((o,i)=>{ if(i%every===0||i===per.length-1) g+=`<text x="${x(i)}" y="${Ht-8}" text-anchor="middle" font-size="11" fill="#8a9183">${dmy(o.d)}</text>`; });
+  const L=per.length-1;
+  $('#lineC').innerHTML = `<svg viewBox="0 0 ${Wd} ${Ht}" id="lsvg">${g}
+    <path d="${path('r')}" fill="none" stroke="#2f7d3c" stroke-width="2" stroke-linejoin="round"/>
+    <path d="${path('p')}" fill="none" stroke="#e2742b" stroke-width="2" stroke-dasharray="5 4" stroke-linejoin="round"/>
+    <circle cx="${x(L)}" cy="${y(per[L].r)}" r="4" fill="#2f7d3c" stroke="#fff" stroke-width="2"/>
+    <circle cx="${x(L)}" cy="${y(per[L].p)}" r="4" fill="#e2742b" stroke="#fff" stroke-width="2"/>
+    <line id="xh" y1="${pt}" y2="${Ht-pb}" stroke="#c9c4b4" stroke-width="1" visibility="hidden"/>
+    <rect x="${pl}" y="${pt}" width="${Wd-pl-pr}" height="${Ht-pt-pb}" fill="transparent" id="hit"/></svg><div class="tip" id="tip"></div>`;
+  const svg=$('#lsvg'), tip=$('#tip');
+  const move = ev => { const b=svg.getBoundingClientRect(); const sx=(ev.clientX-b.left)*Wd/b.width;
+    const i=Math.max(0,Math.min(L,Math.round((sx-pl)/((Wd-pl-pr)/L)))); const o=per[i];
+    const xh=$('#xh'); xh.setAttribute('x1',x(i)); xh.setAttribute('x2',x(i)); xh.setAttribute('visibility','visible');
+    tip.style.display='block'; tip.innerHTML=`<b>${dmy(o.d)}</b><br>ยอดขาย ${fmt(o.r)}<br>กำไร ${fmt(o.p)}`;
+    const px = x(i)*b.width/Wd; tip.style.left = Math.min(px+10, b.width-120)+'px'; tip.style.top='10px'; };
+  $('#hit').addEventListener('pointermove',move);
+  $('#hit').addEventListener('pointerleave',()=>{tip.style.display='none';$('#xh').setAttribute('visibility','hidden')});
+  // bars
+  const hbars = (obj,n) => { const arr=Object.entries(obj).sort((a,b)=>b[1]-a[1]).slice(0,n); const m=arr[0][1];
+    return `<div class="hb">${arr.map(([k,v])=>`<span>${k}</span><div class="tr" title="${k}: ${fmt(v)}"><i style="width:${v/m*100}%"></i></div><span class="v">${fmt(v)}</span>`).join('')}</div>`; };
+  $('#mixC').innerHTML = hbars(byG, 8);
+  $('#farmC').innerHTML = hbars(byF, 8);
+  // top table
+  const top = Object.entries(byP).sort((a,b)=>b[1].r-a[1].r).slice(0,10);
+  $('#topT').innerHTML = `<tr><th>#</th><th>สินค้า</th><th>กลุ่ม</th><th class="r">ขายได้</th><th class="r">ยอดขาย</th><th class="r">% กำไร</th></tr>`+
+    top.map(([id,o],i)=>{const it=KITS.find(k=>k.id===id)||byId[id]; const m=(o.r-o.c)/o.r*100;
+      return `<tr><td>${i+1}</td><td>${it.n}</td><td class="meta">${groupOf(id)}</td><td class="r">${isVeg(id)?(o.u/10).toFixed(1)+' กก.':o.u+' '+(it.u||'ชุด')}</td><td class="r">${fmt(o.r)}</td><td class="r"><span class="mg ${m>=30?'g':m>=15?'y':'r'}">${m.toFixed(0)}%</span></td></tr>`}).join('');
+  // lots
+  const today0 = DAYS[DAYS.length-1].items;
+  $('#lotT').innerHTML = `<tr><th>LOT</th><th>สินค้า</th><th class="r">แพ็ก</th><th class="r">ขายแล้ว</th><th>หมดอายุ</th><th>สถานะ</th></tr>`+
+    KITS.map(k=>{ const made=today0[k.id]+4, sold=Math.min(made, Math.round(today0[k.id]*0.7)); const left=made-sold;
+      const warn = k.grp==='cut' && left>3;
+      return `<tr><td class="meta">${lotOf(k)}</td><td>${k.n}</td><td class="r">${made}</td><td class="r">${sold}</td><td>${dmy(addD(k.grp==='cut'?1:2))}</td>
+      <td>${warn?'<span class="st warn">⚠️ เหลือ '+left+' · ลด 30% 17:00</span>':'<span class="st ok">✓ ปกติ เหลือ '+left+'</span>'}</td></tr>`}).join('');
+}
+document.addEventListener('click',e=>{ const cm=e.target.closest('[data-cal]'); if(cm){ calM=+cm.dataset.cal; document.querySelectorAll('.cal button').forEach(b=>b.classList.toggle('on',b===cm)); $('#calOut').innerHTML=calHTML(calM); return; }
+  const r=e.target.closest('[data-r]'); if(r){ range=+r.dataset.r; document.querySelectorAll('#range button').forEach(b=>b.classList.toggle('on',b===r)); renderDash(); }
+  if(e.target.closest('[data-v=dash]')) renderDash(); });
+
+/* ============ ADD PRODUCT (หลังบ้าน) ============ */
+// บันทึกไว้ในเบราว์เซอร์นี้ (localStorage) — ใช้งานจริงควรต่อฐานข้อมูล
+const store = { get(){ try{ return JSON.parse(localStorage.getItem('bp_custom')||'[]'); }catch(e){ return []; } },
+                set(v){ try{ localStorage.setItem('bp_custom', JSON.stringify(v)); }catch(e){} } };
+$('#aS').innerHTML = TM.slice(1).map((t,i)=>`<label><input type="checkbox" value="${i+1}">${t}</label>`).join('');
+function syncForm(){
+  const c = $('#aC').value, unit = ['pantry','home'].includes(c);
+  $('#aPL').firstChild.textContent = unit ? 'ราคาขาย / หน่วย (฿) *' : 'ราคาขาย / 100 ก. (฿) *';
+  $('#aUL').hidden = !unit; $('#aLL').hidden = unit; $('#aSL').hidden = c!=='fruit';
+}
+$('#aC').addEventListener('change', syncForm);
+function addProduct(o){
+  if(byId[o.id]) return;
+  if(['pantry','home'].includes(o.c)){ GOODS.push(o); }
+  else { if(o.c==='fruit' && !o.col) o.col='#f3c46b'; VEG.push(o); }
+  byId[o.id] = o;
+}
+function renderCustom(){
+  const list = [...VEG,...GOODS].filter(x=>x.custom);
+  $('#customList').innerHTML = list.length ? '🆕 สินค้าที่เพิ่มเอง: ' + list.map(x=>`${x.e} ${x.n} <button class="btn sm ghost" style="padding:1px 8px" data-delp="${x.id}">ลบ</button>`).join(' · ') : '';
+}
+$('#addForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  const c = $('#aC').value, unit = ['pantry','home'].includes(c), p = parseFloat($('#aP').value);
+  const n = $('#aN').value.trim(); if(!n || isNaN(p)) return;
+  const cost = parseFloat($('#aCost').value);
+  const o = { id:'u'+Date.now().toString(36), custom:true, n, c, e:$('#aE').value, p,
+    cost: isNaN(cost) ? Math.round(p*(unit?0.85:0.62)*100)/100 : cost,
+    farm: $('#aF').value.trim() || 'ยังไม่ระบุสวน' };
+  if(unit){ o.u = $('#aU').value.trim() || 'ชิ้น'; }
+  else { const l = parseFloat($('#aL').value); o.loss = isNaN(l) ? (LOSS[c] ?? 10) : l; }
+  if(c==='fruit'){ const s=[...$('#aS').querySelectorAll('input:checked')].map(x=>+x.value); o.s = s.length?s:[1,2,3,4,5,6,7,8,9,10,11,12]; o.k='10–13°C'; o.d=5; }
+  addProduct(o); store.set([...store.get(), o]);
+  const imgF = $('#aImg').files[0]; if(imgF) setPhoto(o.id, imgF);
+  fillPhSel();
+  e.target.reset(); syncForm();
+  $('#aMsg').textContent = '✅ เพิ่ม "'+n+'" แล้ว ดูได้ที่หน้าร้าน';
+  renderShop(); renderBack(); renderCustom();
+});
+document.addEventListener('click', e=>{
+  const d = e.target.closest('[data-delp]'); if(!d) return;
+  const id = d.dataset.delp; const i1 = VEG.findIndex(x=>x.id===id), i2 = GOODS.findIndex(x=>x.id===id);
+  if(i1>=0) VEG.splice(i1,1); if(i2>=0) GOODS.splice(i2,1); delete byId[id]; delete cart[id];
+  store.set(store.get().filter(x=>x.id!==id));
+  renderShop(); renderBack(); renderCart(); renderCustom();
+});
+store.get().forEach(addProduct);
+/* ---- รูปสินค้า: ย่อภาพแล้วเก็บ ---- */
+function shrink(file, max=480){
+  return new Promise((ok,bad)=>{ const r=new FileReader(); r.onerror=bad;
+    r.onload=()=>{ const im=new Image(); im.onerror=bad; im.onload=()=>{
+      const s=Math.min(1,max/Math.max(im.width,im.height)); const c=document.createElement('canvas');
+      c.width=Math.round(im.width*s); c.height=Math.round(im.height*s);
+      c.getContext('2d').drawImage(im,0,0,c.width,c.height); ok(c.toDataURL('image/jpeg',0.8)); }; im.src=r.result; };
+    r.readAsDataURL(file); });
+}
+function fillPhSel(){
+  const all=[...KITS.map(k=>[k.id,'🍲 '+k.n]),...VEG.map(v=>[v.id,v.e+' '+v.n]),...GOODS.map(g=>[g.id,g.e+' '+g.n])];
+  const cur=$('#phSel').value; $('#phSel').innerHTML=all.map(([id,n])=>`<option value="${id}">${PHOTOS[id]?'✅ ':''}${n}</option>`).join(''); if(cur) $('#phSel').value=cur; showPh();
+}
+function showPh(){ const id=$('#phSel').value, src=photoOf(id); $('#phPrev').innerHTML = src?`<img class="photo" src="${src}">`:'<div class="thumb">ยังไม่มีรูป</div>'; }
+async function setPhoto(id,file){
+  try{ PHOTOS[id]=await shrink(file); }catch(e){ $('#phMsg').textContent='❌ เปิดไฟล์ภาพนี้ไม่ได้'; return; }
+  const ok=savePhotos(); $('#phMsg').textContent = ok ? '✅ บันทึกรูปแล้ว ดูได้ที่หน้าร้าน' : '⚠️ ใส่รูปแล้ว แต่พื้นที่เก็บในเบราว์เซอร์เต็ม รูปอาจหายเมื่อรีเฟรช';
+  fillPhSel(); renderShop();
+}
+$('#phSel').addEventListener('change',showPh);
+['phCam','phFile'].forEach(i=>$('#'+i).addEventListener('change',e=>{ const f=e.target.files[0]; if(f) setPhoto($('#phSel').value,f); e.target.value=''; }));
+$('#phDel').addEventListener('click',()=>{ delete PHOTOS[$('#phSel').value]; savePhotos(); $('#phMsg').textContent='ลบรูปที่ใส่เองแล้ว'; fillPhSel(); renderShop(); });
+fillPhSel();
+syncForm(); renderCustom();
+
+/* ============ POS เคาน์เตอร์ ============ */
+const LS = { get(k,d){ try{ return JSON.parse(localStorage.getItem(k)) ?? d; }catch(e){ return d; } }, set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} } };
+let posCat = 'all', posQ = '', bill = [], billDisc = 0, posSales = LS.get('bp_pos_sales', []);
+const posItems = () => [...KITS.map(k=>({...k, kind:'kit'})), ...VEG.map(v=>({...v, kind:'w'})), ...GOODS.map(g=>({...g, kind:'u'}))];
+const findItem = id => posItems().find(x=>x.id===id);
+const todayKey = () => new Date().toISOString().slice(0,10);
+const billNo = () => 'BP-' + todayKey().replace(/-/g,'').slice(2) + '-' + String(posSales.filter(s=>s.day===todayKey()).length+1).padStart(3,'0');
+
+function renderPos(){
+  $('#ppId').value = LS.get('bp_pp','');
+  $('#shopName').value = LS.get('bp_shop','บ้านผัก Baan Phak');
+  const cats=[{id:'all',name:'ทั้งหมด'},...CATS];
+  $('#posCats').innerHTML = cats.map(c=>`<button class="tab ${c.id===posCat?'on':''}" data-pc="${c.id}">${c.name}</button>`).join('');
+  const q=posQ.trim();
+  const list = posItems().filter(x=> (posCat==='all' || (x.kind==='kit' ? (x.grp||'kit')===posCat : x.c===posCat)) && (!q || x.n.includes(q) || x.id===q));
+  $('#posGrid').innerHTML = list.map(x=>{ const src=photoOf(x.id);
+    return `<button class="ptile" data-pa="${x.id}">${src?`<img src="${src}" loading="lazy">`:`<div class="pe">${(x.e||'').slice(0,2)}</div>`}<b>${x.n}</b><span>${baht(x.p)}${x.kind==='w'?'/100ก.':''}</span></button>`; }).join('') || '<div class="empty">ไม่พบสินค้า</div>';
+  renderBill(); renderPosSummary();
+}
+function renderBill(){
+  const fab=$('#posFab'); if(fab){ fab.classList.toggle('on', bill.length>0 && !$('#v-pos').hidden); fab.textContent=`🧾 บิล ${bill.length} รายการ · ${baht(billTotal())}  ›  ชำระเงิน`; }
+  $('#posBillNo').textContent = billNo();
+  $('#posLines').innerHTML = bill.length ? bill.map((l,i)=>`<div class="pl"><div>${l.n}<div class="m">${l.kind==='w'?`${l.g} ก. × ${baht(l.p)}/100ก.`:`${l.q} × ${baht(l.p)}`}</div></div>
+    <div><div style="text-align:right;font-family:Prompt">${baht(lineTotal(l))}</div><div class="ctl">${l.kind==='w'?`<button data-pw="${i}">⚖️</button>`:`<button data-pm="${i}">−</button><button data-pp="${i}">+</button>`}<button data-px="${i}">✕</button></div></div></div>`).join('') : '<div class="empty" style="padding:24px 0">แตะสินค้าทางซ้ายเพื่อเพิ่มลงบิล</div>';
+  const sub = bill.reduce((s,l)=>s+lineTotal(l),0), disc = Math.round(sub*billDisc)/100, total = Math.round((sub-disc)*100)/100;
+  $('#posSum').innerHTML = `<div class="l"><span>รวม ${bill.length} รายการ</span><span>${baht(sub)}</span></div>
+    <div class="l"><span>ส่วนลด <input class="in" type="number" min="0" max="100" id="posDisc" value="${billDisc}"> %</span><span>−${baht(disc)}</span></div>
+    <div class="l"><span>ยอดชำระ</span><span class="t">${baht(total)}</span></div>`;
+}
+const lineTotal = l => l.kind==='w' ? Math.round(l.p*l.g/100*100)/100 : l.p*l.q;
+const billTotal = () => { const sub=bill.reduce((s,l)=>s+lineTotal(l),0); return Math.round((sub - sub*billDisc/100)*100)/100; };
+
+function openModal(html){ $('#mbox').innerHTML=html; $('#modal').classList.add('on'); }
+function closeModal(){ $('#modal').classList.remove('on'); }
+$('#modal').addEventListener('click',e=>{ if(e.target.id==='modal') closeModal(); });
+
+// ชั่งน้ำหนัก
+let wTarget=null, wVal='';
+function askWeight(item, idx){
+  wTarget = {item, idx}; wVal = idx!=null ? String(bill[idx].g) : '';
+  openModal(`<h3>⚖️ ชั่ง ${item.n}</h3><div class="meta">${baht(item.p)} / 100 กรัม · พิมพ์น้ำหนักจากตาชั่ง</div>
+    <div class="bigval"><span id="wShow">${wVal||0}</span> ก.</div><div class="change" id="wPrice">${baht(0)}</div>
+    <div class="quick">${[100,200,250,300,500,1000].map(g=>`<button data-wq="${g}">${g>=1000?g/1000+' กก.':g+' ก.'}</button>`).join('')}</div>
+    <div class="numpad">${[1,2,3,4,5,6,7,8,9,'C',0,'⌫'].map(k=>`<button data-wk="${k}">${k}</button>`).join('')}</div>
+    <button class="btn full" id="wOk">เพิ่มลงบิล</button>`);
+  showW();
+}
+function showW(){ $('#wShow').textContent = wVal||0; $('#wPrice').textContent = baht(wTarget.item.p*(+wVal||0)/100); }
+
+// การชำระเงิน
+let cashVal='';
+function pay(method){
+  if(!bill.length){ toast('ยังไม่มีสินค้าในบิล'); return; }
+  const total = billTotal();
+  if(method==='cash'){
+    cashVal='';
+    const notes=[...new Set([Math.ceil(total), Math.ceil(total/20)*20, Math.ceil(total/100)*100, 500, 1000])].filter(v=>v>=total).slice(0,5);
+    openModal(`<h3>💵 รับเงินสด</h3><div class="l" style="display:flex;justify-content:space-between"><span>ยอดชำระ</span><b style="font-family:Prompt;font-size:20px">${baht(total)}</b></div>
+      <div class="meta" style="margin-top:6px">รับเงินมา</div><div class="bigval">฿<span id="cShow">0</span></div>
+      <div class="quick">${notes.map(n=>`<button data-cq="${n}">${baht(n)}</button>`).join('')}</div>
+      <div class="numpad">${[1,2,3,4,5,6,7,8,9,'C',0,'⌫'].map(k=>`<button data-ck="${k}">${k}</button>`).join('')}</div>
+      <div class="change" id="cChange">เงินทอน ฿0</div><button class="btn full" id="cOk" disabled>✅ รับเงินและออกใบเสร็จ</button>`);
+    showCash();
+  } else if(method==='qr'){
+    const id = LS.get('bp_pp','');
+    if(!id){ openModal(`<h3>📱 พร้อมเพย์</h3><p>ยังไม่ได้ตั้งค่าเบอร์พร้อมเพย์ของร้าน ใส่ได้ที่ "⚙️ ตั้งค่าเคาน์เตอร์" ด้านล่าง</p><button class="btn full" data-close>ตกลง</button>`); return; }
+    openModal(`<h3>📱 สแกนจ่ายพร้อมเพย์</h3><div class="c" style="text-align:center;font-family:Prompt;font-size:22px;color:#1e4fa3">${baht(total)}</div>
+      <div id="qrBox"></div><div class="meta" style="text-align:center">พร้อมเพย์: ${maskId(id)}<br>ให้ลูกค้าสแกนด้วยแอปธนาคาร แล้วตรวจยอดเงินเข้าก่อนกดยืนยัน</div>
+      <button class="btn full" id="qOk" style="margin-top:10px">✅ ได้รับเงินแล้ว ออกใบเสร็จ</button>`);
+    try{ new QRCode($('#qrBox'), {text: promptPay(id,total), width:220, height:220, correctLevel: QRCode.CorrectLevel.M}); }
+    catch(e){ $('#qrBox').innerHTML='<div class="meta">สร้าง QR ไม่ได้ (โหลดตัวสร้าง QR ไม่สำเร็จ)</div>'; }
+  } else {
+    openModal(`<h3>💳 บัตร / โอนเงิน</h3><div style="font-family:Prompt;font-size:22px">${baht(total)}</div>
+      <label class="addf" style="display:block;margin:8px 0"><span class="meta">เลขอ้างอิง/4 หลักท้ายบัตร (ไม่บังคับ)</span><input id="tRef" style="width:100%"></label>
+      <button class="btn full" id="tOk">✅ ชำระแล้ว ออกใบเสร็จ</button>`);
+  }
+}
+function showCash(){ const total=billTotal(), got=+cashVal||0; $('#cShow').textContent=got.toLocaleString('th-TH');
+  const ch=got-total; $('#cChange').textContent = ch>=0 ? 'เงินทอน '+baht(ch) : 'ขาดอีก '+baht(-ch); $('#cChange').style.background = ch>=0?'var(--leaf)':'#fde4df'; $('#cOk').disabled = ch<0; }
+const maskId = id => id.length>=10 ? id.slice(0,3)+'-xxx-'+id.slice(-4) : id;
+
+function finish(method, extra={}){
+  const total = billTotal();
+  const sale = { no: billNo(), day: todayKey(), time: new Date().toTimeString().slice(0,5), method, total, disc: billDisc,
+    lines: bill.map(l=>({id:l.id, n:l.n, kind:l.kind, q:l.q, g:l.g, p:l.p, t:lineTotal(l)})), ...extra };
+  posSales.push(sale); LS.set('bp_pos_sales', posSales);
+  bill=[]; billDisc=0; renderPos(); showReceipt(sale);
+}
+const MNAME = {cash:'เงินสด', qr:'พร้อมเพย์', card:'บัตร/โอน'};
+function showReceipt(s){
+  const shop = LS.get('bp_shop','บ้านผัก Baan Phak');
+  const sub = s.lines.reduce((a,l)=>a+l.t,0);
+  const txt = [shop, `บิล ${s.no}  ${s.day} ${s.time}`, '-----', ...s.lines.map(l=>`${l.n} ${l.kind==='w'?l.g+'ก.':'x'+l.q}  ${l.t.toFixed(2)}`), '-----',
+    s.disc?`ส่วนลด ${s.disc}%  -${(sub-s.total).toFixed(2)}`:'', `รวม ${s.total.toFixed(2)} บาท (${MNAME[s.method]})`, s.method==='cash'?`รับ ${s.received.toFixed(2)} ทอน ${s.change.toFixed(2)}`:'', 'ขอบคุณที่อุดหนุนเกษตรกรไทย 🌱'].filter(Boolean).join('\n');
+  openModal(`<h3>🧾 ใบเสร็จ</h3><div class="receipt"><div class="c"><b>${shop}</b><br><span class="meta">บิล ${s.no} · ${s.day} ${s.time}</span></div><hr>
+    ${s.lines.map(l=>`<div class="r"><span>${l.n}<br><span class="meta">${l.kind==='w'?l.g+' ก. × '+baht(l.p)+'/100ก.':l.q+' × '+baht(l.p)}</span></span><span>${baht(l.t)}</span></div>`).join('')}<hr>
+    ${s.disc?`<div class="r"><span>ส่วนลด ${s.disc}%</span><span>−${baht(sub-s.total)}</span></div>`:''}
+    <div class="r"><b>รวมทั้งสิ้น</b><b>${baht(s.total)}</b></div><div class="r"><span>ชำระโดย</span><span>${MNAME[s.method]}${s.ref?' · '+s.ref:''}</span></div>
+    ${s.method==='cash'?`<div class="r"><span>รับเงิน</span><span>${baht(s.received)}</span></div><div class="r"><b>เงินทอน</b><b>${baht(s.change)}</b></div>`:''}
+    <hr><div class="c meta">ขอบคุณที่อุดหนุนเกษตรกรไทย 🌱</div></div>
+    <div class="row" style="margin-top:10px;gap:6px"><button class="btn ghost" id="rCopy" style="flex:1">คัดลอกใบเสร็จ</button><button class="btn" data-close style="flex:1">บิลใหม่</button></div>`);
+  $('#rCopy').onclick = async ()=>{ try{ await navigator.clipboard.writeText(txt); toast('คัดลอกแล้ว ส่งให้ลูกค้าทางไลน์ได้'); }catch(e){ toast('คัดลอกไม่ได้ในเบราว์เซอร์นี้'); } };
+}
+function renderPosSummary(){
+  const td = posSales.filter(s=>s.day===todayKey() && !s.void);
+  const sum = m => td.filter(s=>!m||s.method===m).reduce((a,s)=>a+s.total,0);
+  $('#posDate').textContent = new Date().toLocaleDateString('th-TH',{dateStyle:'long'});
+  $('#posKpi').innerHTML = `<div class="kpi"><div>ยอดขายหน้าร้าน</div><b>${baht(sum())}</b><small>${td.length} บิล · เฉลี่ย ${baht(td.length?sum()/td.length:0)}/บิล</small></div>
+    <div class="kpi"><div>💵 เงินสด</div><b>${baht(sum('cash'))}</b><small>ควรมีในลิ้นชัก</small></div>
+    <div class="kpi"><div>📱 พร้อมเพย์</div><b>${baht(sum('qr'))}</b></div><div class="kpi"><div>💳 บัตร/โอน</div><b>${baht(sum('card'))}</b></div>`;
+  const last = posSales.filter(s=>s.day===todayKey()).slice(-10).reverse();
+  $('#posBills').innerHTML = `<tr><th>บิล</th><th>เวลา</th><th class="r">รายการ</th><th>ชำระ</th><th class="r">ยอด</th><th></th></tr>` +
+    (last.map(s=>`<tr style="${s.void?'opacity:.45;text-decoration:line-through':''}"><td>${s.no}</td><td>${s.time}</td><td class="r">${s.lines.length}</td><td>${MNAME[s.method]}</td><td class="r">${baht(s.total)}</td>
+      <td><button class="btn sm ghost" data-rv="${s.no}">ใบเสร็จ</button> ${s.void?'':`<button class="btn sm ghost" data-vd="${s.no}">ยกเลิก</button>`}</td></tr>`).join('') || '<tr><td colspan="6" class="meta">ยังไม่มีบิลวันนี้</td></tr>');
+}
+
+// PromptPay EMVCo payload
+function crc16(s){ let c=0xFFFF; for(let i=0;i<s.length;i++){ c^=s.charCodeAt(i)<<8; for(let j=0;j<8;j++) c = c&0x8000 ? ((c<<1)^0x1021)&0xFFFF : (c<<1)&0xFFFF; } return c.toString(16).toUpperCase().padStart(4,'0'); }
+const f = (id,v) => id + String(v.length).padStart(2,'0') + v;
+function promptPay(id, amount){
+  const t = id.replace(/\D/g,'');
+  const acc = t.length>=13 ? f('02', t) : f('01', ('0066'+t.replace(/^0/,'')).padStart(13,'0'));
+  let p = f('00','01') + f('01','12') + f('29', f('00','A000000677010111') + acc) + f('53','764') + f('54', amount.toFixed(2)) + f('58','TH') + '6304';
+  return p + crc16(p);
+}
+
+// events
+document.addEventListener('click', e=>{
+  const t = e.target.closest('button'); if(!t) return; const d=t.dataset;
+  if(d.pc){ posCat=d.pc; renderPos(); }
+  else if(d.pa){ const it=findItem(d.pa); if(it.kind==='w') askWeight(it,null); else { const ex=bill.find(l=>l.id===it.id); if(ex) ex.q++; else bill.push({id:it.id,n:it.n,kind:it.kind,p:it.p,q:1}); renderBill(); } }
+  else if(d.pm){ const l=bill[d.pm]; if(--l.q<=0) bill.splice(d.pm,1); renderBill(); }
+  else if(d.pp){ bill[d.pp].q++; renderBill(); }
+  else if(d.px){ bill.splice(d.px,1); renderBill(); }
+  else if(d.pw){ askWeight(findItem(bill[d.pw].id), +d.pw); }
+  else if(d.wk!==undefined){ wVal = d.wk==='C' ? '' : d.wk==='⌫' ? wVal.slice(0,-1) : (wVal+d.wk).slice(0,5); showW(); }
+  else if(d.wq){ wVal=d.wq; showW(); }
+  else if(t.id==='wOk'){ const g=+wVal; if(!g){ toast('ใส่น้ำหนักก่อน'); return; } const it=wTarget.item;
+    if(wTarget.idx!=null) bill[wTarget.idx].g=g; else bill.push({id:it.id,n:it.n,kind:'w',p:it.p,g}); closeModal(); renderBill(); }
+  else if(d.pay){ pay(d.pay); }
+  else if(d.ck!==undefined){ cashVal = d.ck==='C' ? '' : d.ck==='⌫' ? cashVal.slice(0,-1) : (cashVal+d.ck).slice(0,6); showCash(); }
+  else if(d.cq){ cashVal=d.cq; showCash(); }
+  else if(t.id==='cOk'){ const got=+cashVal; finish('cash',{received:got, change:Math.round((got-billTotal())*100)/100}); }
+  else if(t.id==='qOk'){ finish('qr'); }
+  else if(t.id==='tOk'){ finish('card',{ref:($('#tRef').value||'').trim()}); }
+  else if(d.close!==undefined){ closeModal(); }
+  else if(t.id==='posFab'){ $('.pos-right').scrollIntoView({behavior:'smooth'}); }
+  else if(t.id==='posClear'){ bill=[]; billDisc=0; renderBill(); }
+  else if(d.rv){ showReceipt(posSales.find(s=>s.no===d.rv)); }
+  else if(d.vd){ const s=posSales.find(s=>s.no===d.vd); openModal(`<h3>ยกเลิกบิล ${s.no}?</h3><p>ยอด ${baht(s.total)} จะไม่ถูกนับในสรุปวันนี้</p><div class="row" style="gap:6px"><button class="btn ghost" data-close style="flex:1">ไม่ยกเลิก</button><button class="btn" style="flex:1;background:var(--red)" data-vok="${s.no}">ยืนยันยกเลิก</button></div>`); }
+  else if(d.vok){ posSales.find(s=>s.no===d.vok).void=true; LS.set('bp_pos_sales',posSales); closeModal(); renderPosSummary(); }
+});
+document.addEventListener('change', e=>{
+  if(e.target.id==='posDisc'){ billDisc=Math.max(0,Math.min(100,+e.target.value||0)); renderBill(); }
+  if(e.target.id==='ppId'){ LS.set('bp_pp', e.target.value.replace(/\D/g,'')); toast('บันทึกพร้อมเพย์แล้ว'); }
+  if(e.target.id==='shopName'){ LS.set('bp_shop', e.target.value); }
+});
+$('#posQ').addEventListener('input', e=>{ posQ=e.target.value; renderPos(); $('#posQ').focus(); });
+$('#posQ').addEventListener('keydown', e=>{ if(e.key==='Enter'){ const it=findItem(posQ.trim()) || posItems().find(x=>x.n.includes(posQ.trim())); if(it){ e.preventDefault(); posQ=''; e.target.value=''; t_add(it); } } });
+function t_add(it){ if(it.kind==='w') askWeight(it,null); else { const ex=bill.find(l=>l.id===it.id); if(ex) ex.q++; else bill.push({id:it.id,n:it.n,kind:it.kind,p:it.p,q:1}); renderPos(); } }
+
+/* ---- สไลด์แบนเนอร์: แต่ละภาพมีข้อความของตัวเอง ---- */
+const HERO = [
+  {img:'hero/farm1.png', tag:'🌿 บ้านผัก', t:'ผักสดตัดเช้า ชุดพร้อมปรุง<br>ครบจบในตะกร้าเดียว', s:'ผักขายเป็นขีด (100 กรัม) ชุดต้มยำ แกง ต้ม ผัด เตรียมไว้ให้แล้ว พร้อมของใช้ในครัว', go:'kit'},
+  {img:'hero/fruitbox.png', alt:'img/cantal.png', tag:'🍉 สินค้าพร้อมทาน', t:'ผลไม้ตัดพร้อมทาน<br>ปอก หั่น แพ็กสดทุกเช้า', s:'แตงโมลูกกลม เมล่อนบอล ผลไม้รวม ส้มแกะกลีบ ทับทิมแกะเม็ด แช่เย็นพร้อมทาน', go:'cut'},
+  {img:'img/salad.png', tag:'🥬 ผักสดจากสวน', t:'ผักสลัดและผักใบ<br>ตัดสดจากแปลงทุกวัน', s:'เลือกซื้อเป็นขีดได้ตามต้องการ ไม่ต้องซื้อทั้งกำ', go:'leaf'},
+  {img:'hero/fruitbox2.png', alt:'img/straw.png', tag:'🍓 สินค้าพร้อมทาน', t:'เบอร์รีรวม ฟรุตคัพ<br>ผลไม้เสียบไม้ พร้อมทานทันที', s:'เหมาะเป็นของว่าง ของฝาก และงานเลี้ยง', go:'cut'},
+  {img:'img/mango.png', tag:'🥭 ผลไม้ตามฤดูกาล', t:'ผลไม้ไทยตามฤดูกาล<br>หวาน ฉ่ำ จากสวนโดยตรง', s:'ดูปฏิทินผลไม้ เลือกผลไม้ที่อร่อยที่สุดของเดือนนี้', go:'fruit'},
+  {img:'img/orange.png', tag:'🎁 จัดแต่ง & กระเช้า', t:'ถาดผลไม้จัดเลี้ยง<br>กระเช้าของขวัญ', s:'สั่งล่วงหน้า จัดสดตามออเดอร์ ส่งถึงงาน', go:'deco'},
+];
+(function(){
+  $('#slides').innerHTML = HERO.map((s,i)=>`<i class="${i?'':'on'}" style="background-image:url('${s.img}')${s.alt?`,url('${s.alt}')`:''}"></i>`).join('');
+  $('#dots').innerHTML = HERO.map((s,i)=>`<b class="${i?'':'on'}"></b>`).join('');
+  const hero=document.querySelector('.hero');
+  if(!$('#hGo')) $('#hS').insertAdjacentHTML('afterend','<button class="hbtn" id="hGo">ดูสินค้า ›</button>');
+  let k=0;
+  const show = n => { const a=document.querySelectorAll('#slides i'), d=document.querySelectorAll('#dots b');
+    a[k].classList.remove('on'); d[k].classList.remove('on'); k=n; a[k].classList.add('on'); d[k].classList.add('on');
+    ['hT','hS','hTag'].forEach(id=>$('#'+id).style.opacity=0);
+    setTimeout(()=>{ $('#hT').innerHTML=HERO[k].t; $('#hS').textContent=HERO[k].s; $('#hTag').textContent=HERO[k].tag; ['hT','hS','hTag'].forEach(id=>$('#'+id).style.opacity=1); }, 450); };
+  let timer = setInterval(()=>show((k+1)%HERO.length), 5000);
+  $('#hGo').onclick = ()=>{ curCat = HERO[k].go; renderCats(); renderShop(); $('#cats').scrollIntoView({behavior:'smooth'}); };
+  let x0=null; hero.addEventListener('touchstart',e=>x0=e.touches[0].clientX,{passive:true});
+  hero.addEventListener('touchend',e=>{ if(x0==null) return; const dx=e.changedTouches[0].clientX-x0; x0=null; if(Math.abs(dx)>40){ clearInterval(timer); show((k+(dx<0?1:HERO.length-1))%HERO.length); timer=setInterval(()=>show((k+1)%HERO.length),5000); } });
+})();
+renderCats(); renderShop(); renderCart(); renderBack(); renderDash();
+</script>
+<script src="app-supabase.js"></script>
+</body>
+</html>
