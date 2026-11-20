@@ -232,6 +232,18 @@ main{max-width:1180px;margin:0 auto;padding:16px}
   .bn{display:none}.views button{white-space:nowrap}
   .top{padding:8px 10px;gap:8px}.brand{font-size:16px}.views button{padding:5px 8px;font-size:12px}.cartbtn{padding:6px 10px}
 }
+/* แถบหมวดสินค้าด้านบน + ซ่อนแท็บผู้ดูแล */
+.top{flex-wrap:wrap;row-gap:8px}
+.top .cartbtn#cartBtn{margin-left:auto}
+.views{display:none}
+body.admin .views{display:flex;order:5;width:100%;margin:0;justify-content:center}
+.topcats{order:9;width:100%;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -4px;padding:0 4px 2px}
+.topcats::-webkit-scrollbar{display:none}
+.topcats button{flex:none;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.08);color:#fff;padding:6px 13px;border-radius:999px;font-family:'Prompt';font-size:13px;white-space:nowrap}
+.topcats button.on{background:#fff;color:var(--green);border-color:#fff;font-weight:600}
+#cats{display:none}
+.bn{display:inline!important}
+.adminlink{display:block;margin:30px auto 10px;background:none;border:0;color:var(--muted,#888);font-size:12px;opacity:.7}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -246,6 +258,7 @@ main{max-width:1180px;margin:0 auto;padding:16px}
     <button data-v="dash">แดชบอร์ด</button>
   </div>
   <button class="cartbtn" id="cartBtn">🧺<b id="cartCount">0</b></button>
+  <nav class="topcats" id="topCats"></nav>
 </div>
 
 <main>
@@ -364,6 +377,7 @@ main{max-width:1180px;margin:0 auto;padding:16px}
     <div class="panel"><div class="ph"><h3>📦 ล็อตที่แพ็กวันนี้ (FEFO)</h3><span class="meta">ของที่หมดอายุก่อนขายก่อน · ลดราคาอัตโนมัติ 17:00</span></div><div class="tw" style="border:0"><table class="tbl" id="lotT"></table></div></div>
     <p class="note">* ข้อมูลยอดขายในแดชบอร์ดเป็นข้อมูลจำลองสำหรับสาธิต ต้นทุนดึงจากหน้าหลังบ้านจริง ปรับราคาที่หลังบ้านแล้วตัวเลขที่นี่จะเปลี่ยนตาม</p>
   </section>
+<button class="adminlink" id="adminLink">🔐 สำหรับผู้ดูแลร้าน</button>
 </main>
 
 <div class="mask" id="mask"></div>
@@ -688,6 +702,8 @@ let curCat = 'all', query = '';
 function renderCats(){
   const all = [{id:'all',name:'ทั้งหมด'},...CATS];
   $('#cats').innerHTML = all.map(c=>`<button class="tab ${c.id===curCat?'on':''}" data-c="${c.id}">${c.name}</button>`).join('');
+  const tc=$('#topCats'); if(tc){ tc.innerHTML = all.map(c=>`<button class="${c.id===curCat?'on':''}" data-c="${c.id}">${c.name}</button>`).join('');
+    const on=tc.querySelector('.on'); if(on) on.scrollIntoView({block:'nearest',inline:'center'}); }
 }
 const today = new Date();
 const dmy = d => d.getDate().toString().padStart(2,'0')+'/'+(d.getMonth()+1).toString().padStart(2,'0');
@@ -805,7 +821,8 @@ function openCart(o){ $('#drawer').classList.toggle('on',o); $('#mask').classLis
 document.addEventListener('click',e=>{
   const t = e.target.closest('button'); if(!t) return;
   const d = t.dataset;
-  if(d.c){ curCat=d.c; renderCats(); renderShop(); }
+  if(d.c){ curCat=d.c; if($('#v-shop').hidden){ const sb=document.querySelector('#views [data-v=shop]'); if(sb) sb.click(); } renderCats(); renderShop();
+    if(t.closest('#topCats')){ const y=$('#shopBody').getBoundingClientRect().top+scrollY-$('.top').offsetHeight-8; scrollTo({top:Math.max(0,y),behavior:'auto'}); } }
   else if(d.inc){ pick[d.inc]=(pick[d.inc]||1)+1; renderShop(); }
   else if(d.dec){ pick[d.dec]=Math.max(1,(pick[d.dec]||1)-1); renderShop(); }
   else if(d.add){ addToCart(d.add); }
@@ -1262,7 +1279,7 @@ const HERO = [
     ['hT','hS','hTag'].forEach(id=>$('#'+id).style.opacity=0);
     setTimeout(()=>{ $('#hT').innerHTML=HERO[k].t; $('#hS').textContent=HERO[k].s; $('#hTag').textContent=HERO[k].tag; ['hT','hS','hTag'].forEach(id=>$('#'+id).style.opacity=1); }, 450); };
   let timer = setInterval(()=>show((k+1)%HERO.length), 5000);
-  $('#hGo').onclick = ()=>{ curCat = HERO[k].go; renderCats(); renderShop(); $('#cats').scrollIntoView({behavior:'smooth'}); };
+  $('#hGo').onclick = ()=>{ curCat = HERO[k].go; renderCats(); renderShop(); $('#shopBody').scrollIntoView({behavior:'smooth'}); };
   let x0=null; hero.addEventListener('touchstart',e=>x0=e.touches[0].clientX,{passive:true});
   hero.addEventListener('touchend',e=>{ if(x0==null) return; const dx=e.changedTouches[0].clientX-x0; x0=null; if(Math.abs(dx)>40){ clearInterval(timer); show((k+(dx<0?1:HERO.length-1))%HERO.length); timer=setInterval(()=>show((k+1)%HERO.length),5000); } });
 })();

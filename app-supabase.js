@@ -49,6 +49,8 @@ async function refreshAuth(){
   document.body.classList.toggle('is-admin', IS_ADMIN);
   const b = document.getElementById('authBtn');
   if (b) b.textContent = IS_ADMIN ? '🔓 ' + (ME.email||'').split('@')[0] : '🔐';
+  if (b) b.style.display = IS_ADMIN ? '' : 'none';
+  document.body.classList.toggle('admin', !!IS_ADMIN);
 }
 function loginModal(after){
   openModal(`<h3>🔐 เข้าสู่ระบบผู้ดูแล</h3><p class="meta">เคาน์เตอร์ หลังบ้าน และแดชบอร์ด ใช้ได้เฉพาะผู้ดูแลร้าน</p>
@@ -81,7 +83,10 @@ function loginModal(after){
 // ปุ่มล็อกอินบนแถบด้านบน
 (function(){
   const b = document.createElement('button'); b.id='authBtn'; b.className='cartbtn'; b.style.background='rgba(255,255,255,.18)'; b.textContent='🔐';
+  b.style.display='none'; // แสดงเฉพาะตอนเป็นผู้ดูแล
   document.querySelector('.top').insertBefore(b, document.getElementById('cartBtn'));
+  const al=document.getElementById('adminLink'); if(al) al.onclick=()=>{ IS_ADMIN ? document.querySelector('#views [data-v=back]').click() : loginModal(); };
+  if (location.hash==='#admin') setTimeout(()=>{ if(!IS_ADMIN) loginModal(); },800);
   b.onclick = async () => { if (IS_ADMIN) { await sb.auth.signOut(); await refreshAuth(); toast('ออกจากระบบแล้ว'); document.querySelector('#views [data-v=shop]').click(); } else loginModal(); };
 })();
 // กันเข้าแท็บผู้ดูแลถ้ายังไม่ล็อกอิน
