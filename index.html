@@ -244,6 +244,19 @@ body.admin .views{display:flex;order:5;width:100%;margin:0;justify-content:cente
 #cats{display:none}
 .bn{display:inline!important}
 .adminlink{display:block;margin:30px auto 10px;background:none;border:0;color:var(--muted,#888);font-size:12px;opacity:.7}
+/* ผักแพ็กพร้อมปรุง */
+.ptray{position:relative;height:150px;border-radius:12px;background:linear-gradient(160deg,#fff,#eef2f4);border:3px solid #e6ecef;box-shadow:inset 0 0 0 7px #f7fafb,0 3px 8px rgba(0,0,0,.08);overflow:hidden;padding:12px 12px 10px}
+.ptray.dark{background:linear-gradient(160deg,#3a3a3a,#1a1a1a);border-color:#2b2b2b;box-shadow:inset 0 0 0 7px #262626,0 3px 8px rgba(0,0,0,.15)}
+.ptray.vac{background:linear-gradient(160deg,#fffbe6,#f3ecc4);border-color:#eadf9f;box-shadow:inset 0 0 0 7px #fff8d6}
+.pitems{display:flex;flex-wrap:wrap;gap:0 2px;font-size:27px;line-height:1.1;max-width:100%}
+.pitems span:nth-child(odd){transform:rotate(-14deg)}.pitems span:nth-child(3n){transform:rotate(20deg)}
+.ptray::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,rgba(255,255,255,.6) 0 14%,transparent 26% 58%,rgba(255,255,255,.4) 70%,transparent 82%);pointer-events:none}
+.prib{position:absolute;left:-10px;right:-10px;top:47%;height:18px;color:#fff;font-size:10.5px;font-family:'Prompt';white-space:nowrap;overflow:hidden;line-height:20px;text-align:center;transform:rotate(-3deg);opacity:.95;letter-spacing:.3px}
+.psticker{position:absolute;right:8px;bottom:8px;background:#fff;border:1px solid #ddd;border-radius:5px;padding:3px 7px 4px;font-size:9px;line-height:1.25;color:#333;z-index:2;box-shadow:0 1px 4px rgba(0,0,0,.2);min-width:84px}
+.psticker b{display:block;font-family:'Prompt';font-size:10px;max-width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.psticker span{color:var(--green);font-weight:600}
+.psticker em{float:right;font-style:normal;font-family:'Prompt';font-weight:700;font-size:13px;color:#c62828;margin-left:6px;line-height:1}
+.psticker .bc{display:block;height:9px;margin-top:2px;background:repeating-linear-gradient(90deg,#222 0 1px,transparent 1px 2px,#222 2px 4px,transparent 4px 5px)}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -393,6 +406,7 @@ body.admin .views{display:flex;order:5;width:100%;margin:0;justify-content:cente
 // ผัก/ผลไม้: p = ราคาขายต่อ 100 กรัม (บาท), farm = สวนต้นทาง
 const CATS = [
   {id:'kit',   name:'🍲 ชุดพร้อมปรุง'},
+  {id:'pack',  name:'🥡 ผักแพ็กพร้อมปรุง'},
   {id:'cut',   name:'🍉 ผลไม้ตัดพร้อมทาน'},
   {id:'deco',  name:'🎁 ถาดผลไม้จัดแต่ง/กระเช้า'},
   {id:'leaf',  name:'🥬 ผักใบ'},
@@ -562,6 +576,25 @@ const VEG = [
 ];
 // สินค้าชิ้น: p = ราคาต่อหน่วย
 const GOODS = [
+  // ผักแพ็กพร้อมปรุง
+  {id:'pk-suki', n:'ชุดผักสุกี้ (ใหญ่) ผักกาดขาว เห็ด ข้าวโพดอ่อน แครอท ผักชี', e:'🥬', c:'pack', p:49, u:'แพ็ก'},
+  {id:'pk-sukimini', n:'ชุดผักสุกี้ (เล็ก)', e:'🥬', c:'pack', p:22, u:'แพ็ก'},
+  {id:'pk-tomyum', n:'ชุดต้มยำถาด ข่า ตะไคร้ หอมแดง มะนาว พริก ใบมะกรูด', e:'🍋', c:'pack', p:25, u:'แพ็ก'},
+  {id:'pk-kaengliang', n:'ชุดแกงเลียง ฟักทอง เห็ด บวบ ใบแมงลัก พริก', e:'🍠', c:'pack', p:27, u:'แพ็ก'},
+  {id:'pk-kiaowan', n:'ชุดแกงเขียวหวาน มะเขือ ใบโหระพา พริก', e:'🍆', c:'pack', p:27, u:'แพ็ก'},
+  {id:'pk-chuchee', n:'ชุดผักฉู่ฉี่ ฟักทอง พริกไทยอ่อน เห็ด พริก', e:'🌶️', c:'pack', p:22, u:'แพ็ก'},
+  {id:'pk-khanun', n:'ชุดแกงขนุน ขนุนอ่อน มะเขือเทศ ชะอม', e:'🥘', c:'pack', p:27, u:'แพ็ก'},
+  {id:'pk-yanang', n:'ชุดแกงหน่อไม้ น้ำใบย่านาง ฟักทอง เห็ด พริก', e:'🌿', c:'pack', p:20, u:'แพ็ก'},
+  {id:'pk-plang', n:'ผักปลังแพ็ก', e:'🌿', c:'pack', p:27, u:'แพ็ก'},
+  {id:'pk-pumpcorn', n:'ฟักทองข้าวโพด พร้อมปรุง', e:'🌽', c:'pack', p:27, u:'แพ็ก'},
+  {id:'pk-mixveg', n:'ชุดผักรวม บรอกโคลี กะหล่ำดอก เห็ด แครอท หน่อไม้ฝรั่ง', e:'🥦', c:'pack', p:20, u:'แพ็ก'},
+  {id:'pk-carrot', n:'แครอทแพ็ก (2 หัว)', e:'🥕', c:'pack', p:10, u:'แพ็ก'},
+  {id:'pk-babycorn', n:'ข้าวโพดอ่อนแพ็ก', e:'🌽', c:'pack', p:15, u:'แพ็ก'},
+  {id:'pk-chilig', n:'พริกขี้หนูเขียวแพ็ก', e:'🌶️', c:'pack', p:10, u:'แพ็ก'},
+  {id:'pk-chilired', n:'พริกชี้ฟ้าแดงแพ็ก', e:'🌶️', c:'pack', p:15, u:'แพ็ก'},
+  {id:'pk-chiliyuak', n:'พริกหยวกแพ็ก', e:'🫑', c:'pack', p:15, u:'แพ็ก'},
+  {id:'pk-garlic', n:'กระเทียมปอกแพ็ก', e:'🧄', c:'pack', p:20, u:'แพ็ก'},
+  {id:'pk-nomai', n:'หน่อไม้ต้มแพ็กสุญญากาศ', e:'🎋', c:'pack', p:25, u:'แพ็ก'},
   {id:'egg10', n:'ไข่ไก่ เบอร์ 2 (10 ฟอง)', e:'🥚', c:'pantry', p:45, u:'แพ็ก'},
   {id:'egg30', n:'ไข่ไก่ เบอร์ 2 (แผง 30 ฟอง)', e:'🥚', c:'pantry', p:125, u:'แผง'},
   {id:'oil1',  n:'น้ำมันพืช (ถั่วเหลือง) 1 ลิตร', e:'🫗', c:'pantry', p:55, u:'ขวด'},
@@ -753,6 +786,31 @@ function vegCard(v){
     <button class="btn sm full" data-add="${v.id}">ใส่ตะกร้า ${baht(v.p*u)}</button>
   </div>`;
 }
+const PACKEM = {
+  'pk-suki':'🥬🍄🌽🥕🌿🥬', 'pk-sukimini':'🥬🍄🥕🌿', 'pk-tomyum':'🍋🌶️🧅🌿🫚🌶️', 'pk-kaengliang':'🍠🍄🥒🌿🌶️',
+  'pk-kiaowan':'🍆🫛🌿🌶️🍆', 'pk-chuchee':'🍠🫛🍄🌶️', 'pk-khanun':'🍈🍅🌿🍅', 'pk-yanang':'🍠🍄🌶️🥒🌿',
+  'pk-plang':'🌿🌿🍅🌶️', 'pk-pumpcorn':'🍠🌽🌽🍠', 'pk-mixveg':'🥦🥦🍄🥕🥬🍅', 'pk-carrot':'🥕🥕',
+  'pk-babycorn':'🌽🌽🌽🌽🌽', 'pk-chilig':'🌶️🌶️🌶️🌶️🌶️🌶️', 'pk-chilired':'🌶️🌶️🌶️🌶️🌶️', 'pk-chiliyuak':'🫑🫑🫑🫑',
+  'pk-garlic':'🧄🧄🧄🧄🧄', 'pk-nomai':'🎋🎋🎋🎋' };
+const PACKRIB = ['#c8102e','#2e7d32','#e65100','#6a1b9a'];
+function packCard(g){
+  const em = [...(PACKEM[g.id] || (g.e+g.e+g.e))].join('').match(/\p{Extended_Pictographic}\uFE0F?/gu) || [g.e];
+  const short = g.n.split(/ (?=[ก-๙A-Za-z]+ [ก-๙])/)[0].replace(/ \(.*\)/,'');
+  const sub = g.n.slice(short.length).trim();
+  const dark = /chili|garlic/.test(g.id);
+  const rib = PACKRIB[[...g.id].reduce((a,c)=>a+c.charCodeAt(0),0)%PACKRIB.length];
+  const vac = g.id==='pk-nomai';
+  const photo = photoOf(g.id);
+  return `<div class="card pack">
+    ${photo?`<img class="photo" src="${photo}" alt="${g.n}" loading="lazy">`:
+    `<div class="ptray ${dark?'dark':''} ${vac?'vac':''}"><div class="pitems">${em.map(x=>`<span>${x}</span>`).join('')}</div>
+      ${vac?'':`<div class="prib" style="background:${rib}">♥ For you ♥ บ้านผัก ♥ For you ♥</div>`}
+      <div class="psticker"><b>${short}</b><span>บ้านผัก</span><em>${baht(g.p)}</em><i class="bc"></i></div></div>`}
+    <h3>${short}</h3>${sub?`<div class="meta" style="font-size:12.5px;margin:-4px 0 4px">${sub}</div>`:''}
+    <div class="price">${baht(g.p)} <small>/${g.u}</small></div>
+    <button class="btn sm full" style="margin-top:auto" data-add="${g.id}">+ ใส่ตะกร้า</button>
+  </div>`;
+}
 function goodCard(g){
   return `<div class="card">
     ${photoOf(g.id)?`<img class="photo" src="${photoOf(g.id)}" alt="${g.n}" loading="lazy">`:`<div class="thumb" style="background:var(--cream)">${g.e}</div>`}
@@ -769,10 +827,10 @@ function renderShop(){
   for(const c of cats){
     let items, fn, cls='grid';
     if(['kit','cut','deco'].includes(c.id)){ items = KITS.filter(k=>(k.grp||'kit')===c.id && match(k)); fn = kitCard; cls='grid kits'; }
-    else if(['pantry','home'].includes(c.id)){ items = GOODS.filter(g=>g.c===c.id && match(g)); fn = goodCard; }
+    else if(['pack','pantry','home'].includes(c.id)){ items = GOODS.filter(g=>g.c===c.id && match(g)); fn = c.id==='pack' ? packCard : goodCard; }
     else { items = VEG.filter(v=>v.c===c.id && match(v)); fn = vegCard; if(c.id==='fruit') items.sort((a,b)=>inSeason(b)-inSeason(a)); }
     if(!items.length) continue;
-    const sub = c.id==='deco' ? 'จัดตามออเดอร์ งานเลี้ยง/ของขวัญ' : c.id==='fruit' ? 'ขายเป็นขีด · ป้ายเขียว = อยู่ในฤดู' : c.id==='cut' ? 'ปอก หั่น แช่เย็น พร้อมทาน' : c.id==='kit' ? 'เตรียมสด ล้าง หั่น ชั่งให้แล้ว' : (['pantry','home'].includes(c.id) ? 'ราคาต่อชิ้น' : 'ขายเป็นขีด (100 ก.)');
+    const sub = c.id==='deco' ? 'จัดตามออเดอร์ งานเลี้ยง/ของขวัญ' : c.id==='fruit' ? 'ขายเป็นขีด · ป้ายเขียว = อยู่ในฤดู' : c.id==='cut' ? 'ปอก หั่น แช่เย็น พร้อมทาน' : c.id==='kit' ? 'เตรียมสด ล้าง หั่น ชั่งให้แล้ว' : c.id==='pack' ? 'แพ็กถาด พร้อมปรุง ราคาต่อแพ็ก' : (['pack','pantry','home'].includes(c.id) ? 'ราคาต่อชิ้น' : 'ขายเป็นขีด (100 ก.)');
     html += `<div class="sec-h"><h2>${c.name}</h2><span>${items.length} รายการ · ${sub}</span></div>${c.id==='fruit'?seasonStrip():''}<div class="${cls}">${items.map(fn).join('')}</div>`;
   }
   $('#shopBody').innerHTML = html || '<div class="empty">ไม่พบสินค้า</div>';
@@ -1031,14 +1089,14 @@ const store = { get(){ try{ return JSON.parse(localStorage.getItem('bp_custom')|
                 set(v){ try{ localStorage.setItem('bp_custom', JSON.stringify(v)); }catch(e){} } };
 $('#aS').innerHTML = TM.slice(1).map((t,i)=>`<label><input type="checkbox" value="${i+1}">${t}</label>`).join('');
 function syncForm(){
-  const c = $('#aC').value, unit = ['pantry','home'].includes(c);
+  const c = $('#aC').value, unit = ['pack','pantry','home'].includes(c);
   $('#aPL').firstChild.textContent = unit ? 'ราคาขาย / หน่วย (฿) *' : 'ราคาขาย / 100 ก. (฿) *';
   $('#aUL').hidden = !unit; $('#aLL').hidden = unit; $('#aSL').hidden = c!=='fruit';
 }
 $('#aC').addEventListener('change', syncForm);
 function addProduct(o){
   if(byId[o.id]) return;
-  if(['pantry','home'].includes(o.c)){ GOODS.push(o); }
+  if(['pack','pantry','home'].includes(o.c)){ GOODS.push(o); }
   else { if(o.c==='fruit' && !o.col) o.col='#f3c46b'; VEG.push(o); }
   byId[o.id] = o;
 }
@@ -1048,7 +1106,7 @@ function renderCustom(){
 }
 $('#addForm').addEventListener('submit', e=>{
   e.preventDefault();
-  const c = $('#aC').value, unit = ['pantry','home'].includes(c), p = parseFloat($('#aP').value);
+  const c = $('#aC').value, unit = ['pack','pantry','home'].includes(c), p = parseFloat($('#aP').value);
   const n = $('#aN').value.trim(); if(!n || isNaN(p)) return;
   const cost = parseFloat($('#aCost').value);
   const o = { id:'u'+Date.now().toString(36), custom:true, n, c, e:$('#aE').value, p,

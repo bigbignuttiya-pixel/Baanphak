@@ -121,7 +121,7 @@ addProduct = function(o){
       const f = await sb.from('farms').upsert({ name:o.farm }, { onConflict:'name' }).select('id').single();
       farm_id = f.data?.id ?? null;
     }
-    const unit = ['pantry','home'].includes(o.c);
+    const unit = ['pack','pantry','home'].includes(o.c);
     await save(sb.from('products').insert({ id:o.id, name:o.n, category_id:o.c, sell_by: unit?'unit':'weight', emoji:o.e, price:o.p, cost:o.cost,
       loss_pct: o.loss ?? 0, unit: o.u ?? null, farm_id, season_months: o.s ?? null, storage:o.k ?? null, shelf_days:o.d ?? null }), '💾 เพิ่มสินค้าลงฐานข้อมูลแล้ว');
   })();
