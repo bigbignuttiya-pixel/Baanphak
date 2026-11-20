@@ -821,8 +821,8 @@ function openCart(o){ $('#drawer').classList.toggle('on',o); $('#mask').classLis
 document.addEventListener('click',e=>{
   const t = e.target.closest('button'); if(!t) return;
   const d = t.dataset;
-  if(d.c){ curCat=d.c; if($('#v-shop').hidden){ const sb=document.querySelector('#views [data-v=shop]'); if(sb) sb.click(); } renderCats(); renderShop();
-    if(t.closest('#topCats')){ const y=$('#shopBody').getBoundingClientRect().top+scrollY-$('.top').offsetHeight-8; scrollTo({top:Math.max(0,y),behavior:'auto'}); } }
+  if(d.c){ const fromTop=!!t.closest('#topCats'); curCat=d.c; if($('#v-shop').hidden){ const sb=document.querySelector('#views [data-v=shop]'); if(sb) sb.click(); } renderCats(); renderShop();
+    if(fromTop){ const y=$('#shopBody').getBoundingClientRect().top+scrollY-$('.top').offsetHeight-8; scrollTo({top:Math.max(0,y),behavior:'auto'}); } }
   else if(d.inc){ pick[d.inc]=(pick[d.inc]||1)+1; renderShop(); }
   else if(d.dec){ pick[d.dec]=Math.max(1,(pick[d.dec]||1)-1); renderShop(); }
   else if(d.add){ addToCart(d.add); }
