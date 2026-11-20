@@ -86,6 +86,11 @@ function loginModal(after){
   b.style.display='none'; // แสดงเฉพาะตอนเป็นผู้ดูแล
   document.querySelector('.top').insertBefore(b, document.getElementById('cartBtn'));
   const al=document.getElementById('adminLink'); if(al) al.onclick=()=>{ IS_ADMIN ? document.querySelector('#views [data-v=back]').click() : loginModal(); };
+  // แตะโลโก้ "บ้านผัก" 5 ครั้งติดกัน → เข้าระบบหลังบ้าน
+  let taps=0, tt=null; const goBack=()=>document.querySelector('#views [data-v=back]').click();
+  const br=document.querySelector('.top .brand'); if(br){ br.style.cursor='pointer'; br.style.userSelect='none'; br.style.webkitUserSelect='none';
+    br.addEventListener('click',()=>{ taps++; clearTimeout(tt); tt=setTimeout(()=>taps=0,1500);
+      if(taps>=5){ taps=0; IS_ADMIN ? goBack() : loginModal(goBack); } }); }
   if (location.hash==='#admin') setTimeout(()=>{ if(!IS_ADMIN) loginModal(); },800);
   b.onclick = async () => { if (IS_ADMIN) { await sb.auth.signOut(); await refreshAuth(); toast('ออกจากระบบแล้ว'); document.querySelector('#views [data-v=shop]').click(); } else loginModal(); };
 })();
