@@ -197,3 +197,102 @@ document.addEventListener('click', e => { const d = e.target.closest('[data-vok]
   if (IS_ADMIN) { await loadPosSalesFromDB(); renderPosSummary(); }
   sb.auth.onAuthStateChange(() => refreshAuth());
 })();
+
+/* =========================================================
+   8) ออเดอร์ออนไลน์ + ใบเตรียมของ + ยอดขายจริง (เฉพาะผู้ดูแล)
+   ========================================================= */
+const ST = { new:'🆕 ใหม่', packing:'📦 กำลังแพ็ก', delivering:'🛵 กำลังส่ง', done:'✅ ส่งแล้ว', cancelled:'✖️ ยกเลิก' };
+let ORDERS = [];
+(function injectAdminSections(){
+  const back = document.getElementById('v-back');
+  back.insertAdjacentHTML('afterbegin', `
+    <div class="sec-h"><h2>📦 ออเดอร์ออนไลน์</h2><span><button class="btn sm ghost" id="ordReload">↻ โหลดใหม่</button></span></div>
+    <div class="cats" id="ordTabs"></div>
+    <div class="tw" style="margin-bottom:12px"><table class="tbl" id="ordTbl"></table></div>
+    <div class="sec-h"><h2>🔪 ใบเตรียมของ</h2><span class="meta">จากออเดอร์ที่ยังไม่ส่ง (ใหม่ + กำลังแพ็ก)</span></div>
+    <div class="two" style="margin-bottom:16px"><div class="panel"><div class="ph"><h3>ชุด/กล่องที่ต้องแพ็ก</h3></div><div id="prepKits"></div></div>
+      <div class="panel"><div class="ph"><h3>วัตถุดิบที่ต้องเตรียม (รวมส่วนสูญเสีย)</h3></div><div id="prepRaw"></div></div></div>`);
+  document.getElementById('v-dash').insertAdjacentHTML('afterbegin', `
+    <div class="sec-h"><h2>💰 ยอดขายจริงจากระบบ</h2><div class="seg" id="realRange"><button data-rr="1" class="on">วันนี้</button><button data-rr="7">7 วัน</button><button data-rr="30">30 วัน</button></div></div>
+    <div class="kpis big" id="realKpi"><div class="kpi"><div>เข้าสู่ระบบเพื่อดูยอดขายจริง</div></div></div>
+    <div class="panel"><div class="ph"><h3>สินค้าขายดี (ยอดจริง)</h3></div><div id="realTop" class="meta">—</div></div>
+    <p class="note" style="margin:4px 0 18px">ส่วนด้านล่างเป็นข้อมูลจำลองสำหรับวางแผน</p>`);
+})();
+let ordFilter = 'open', realDays = 1;
+async function loadOrders(){
+  if (!IS_ADMIN) return;
+  const since = new Date(); since.setDate(since.getDate() - 30);
+  const { data, error } = await sb.from('orders').select('*, order_items(*)').gte('created_at', since.toISOString()).order('created_at', { ascending:false });
+  if (error) { toast('❌ โหลดออเดอร์ไม่ได้'); console.error(error); return; }
+  ORDERS = data; renderOrders(); renderPrep(); renderReal();
+}
+function renderOrders(){
+  const online = ORDERS.filter(o => o.channel === 'online');
+  const tabs = [['open','ยังไม่ส่ง'],['new',ST.new],['packing',ST.packing],['delivering',ST.delivering],['done',ST.done],['all','ทั้งหมด']];
+  const cnt = f => online.filter(o => f==='all' || (f==='open' ? ['new','packing','delivering'].includes(o.status) : o.status===f)).length;
+  $('#ordTabs').innerHTML = tabs.map(([f,n]) => `<button class="tab ${f===ordFilter?'on':''}" data-of="${f}">${n} (${cnt(f)})</button>`).join('');
+  const list = online.filter(o => ordFilter==='all' || (ordFilter==='open' ? ['new','packing','delivering'].includes(o.status) : o.status===ordFilter));
+  $('#ordTbl').innerHTML = `<tr><th>#</th><th>เวลา</th><th>ลูกค้า</th><th>รอบส่ง</th><th class="r">ยอด</th><th>สถานะ</th></tr>` +
+    (list.map(o => { const t = new Date(o.created_at);
+      return `<tr class="k" data-ord="${o.id}"><td>#${o.id}</td><td>${t.toLocaleDateString('th-TH',{day:'numeric',month:'short'})} ${t.toTimeString().slice(0,5)}</td>
+        <td>${esc(o.customer_name||'-')}<br><span class="meta">${esc(o.phone||'')}</span></td><td class="meta">${esc(o.delivery_slot||'')}${o.no_bag?'<br>🌍 ไม่รับถุง':''}</td>
+        <td class="r">${baht(+o.total)}</td>
+        <td><select data-os="${o.id}" class="in" style="width:auto;text-align:left">${Object.entries(ST).map(([k,v])=>`<option value="${k}" ${k===o.status?'selected':''}>${v}</option>`).join('')}</select></td></tr>
+        <tr class="det" data-odet="${o.id}" hidden><td colspan="6">${o.order_items.map(i=>`${esc(i.name||i.kit_id||i.product_id)} — ${i.grams?(+i.grams)+' ก.':(+i.qty)+' ชิ้น'} · ${baht(+i.line_total)}`).join('<br>')}</td></tr>`; }).join('')
+     || '<tr><td colspan="6" class="meta">ไม่มีออเดอร์ในกลุ่มนี้</td></tr>');
+}
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function renderPrep(){
+  const open = ORDERS.filter(o => o.channel==='online' && ['new','packing'].includes(o.status));
+  const kitsCnt = {}, raw = {};
+  const addRaw = (id, g) => { raw[id] = (raw[id]||0) + g; };
+  for (const o of open) for (const i of o.order_items) {
+    if (i.kit_id) { kitsCnt[i.kit_id] = (kitsCnt[i.kit_id]||0) + (+i.qty);
+      const k = KITS.find(x=>x.id===i.kit_id); if (!k) continue;
+      for (const [pid, q] of k.bom) { const v = byId[pid]; if (!v) continue;
+        if (isVeg(pid)) addRaw(pid, q * (k.whole ? 1 : 1 + (v.loss||0)/100) * (+i.qty)); else addRaw(pid, q * (+i.qty)); } }
+    else if (i.product_id) { const v = byId[i.product_id]; if (!v) continue; addRaw(i.product_id, isVeg(i.product_id) ? (+i.grams || +i.qty*100) : +i.qty); }
+  }
+  const kl = Object.entries(kitsCnt).sort((a,b)=>b[1]-a[1]);
+  $('#prepKits').innerHTML = kl.length ? kl.map(([id,n]) => { const k = KITS.find(x=>x.id===id); return `<div class="pl"><div>${k?k.n:id}</div><b style="font-family:Prompt">${n} ชุด</b></div>`; }).join('') : '<div class="meta">ยังไม่มีชุดที่ต้องแพ็ก</div>';
+  const rl = Object.entries(raw).sort((a,b)=>b[1]-a[1]);
+  $('#prepRaw').innerHTML = rl.length ? rl.map(([id,g]) => { const v = byId[id];
+      const amt = isVeg(id) ? (g>=1000 ? (g/1000).toFixed(2)+' กก.' : Math.round(g)+' ก.') : (Math.round(g*10)/10)+' '+(v?.u||'ชิ้น');
+      return `<div class="pl"><div>${v?v.e+' '+v.n:id}</div><b style="font-family:Prompt">${amt}</b></div>`; }).join('') : '<div class="meta">—</div>';
+}
+function renderReal(){
+  if (!IS_ADMIN) return;
+  const since = new Date(); since.setHours(0,0,0,0); since.setDate(since.getDate() - (realDays-1));
+  const os = ORDERS.filter(o => new Date(o.created_at) >= since && !o.is_void && o.status !== 'cancelled');
+  const sum = f => os.filter(f).reduce((a,o)=>a + +o.total, 0);
+  const on = sum(o=>o.channel==='online'), pos = sum(o=>o.channel==='pos');
+  $('#realKpi').innerHTML = `<div class="kpi"><div>ยอดขายรวม</div><b>${fmt(on+pos)}</b><small>${os.length} บิล/ออเดอร์</small></div>
+    <div class="kpi"><div>🛒 ออนไลน์</div><b>${fmt(on)}</b><small>${os.filter(o=>o.channel==='online').length} ออเดอร์</small></div>
+    <div class="kpi"><div>🏪 หน้าร้าน</div><b>${fmt(pos)}</b><small>${os.filter(o=>o.channel==='pos').length} บิล</small></div>
+    <div class="kpi"><div>ออเดอร์รอส่ง</div><b>${ORDERS.filter(o=>o.channel==='online'&&['new','packing','delivering'].includes(o.status)).length}</b><small>ทั้งหมดที่ยังไม่ส่ง</small></div>`;
+  const by = {};
+  for (const o of os) for (const i of o.order_items) { const k = i.name || i.kit_id || i.product_id; by[k] = (by[k]||0) + +i.line_total; }
+  const top = Object.entries(by).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  $('#realTop').innerHTML = top.length ? `<div class="hb">${top.map(([n,v])=>`<span>${esc(n)}</span><div class="tr"><i style="width:${v/top[0][1]*100}%"></i></div><span class="v">${fmt(v)}</span>`).join('')}</div>` : 'ยังไม่มียอดขายในช่วงนี้';
+}
+document.addEventListener('click', e => {
+  const of = e.target.closest('[data-of]'); if (of) { ordFilter = of.dataset.of; renderOrders(); return; }
+  const rr = e.target.closest('[data-rr]'); if (rr) { realDays = +rr.dataset.rr; document.querySelectorAll('#realRange button').forEach(b=>b.classList.toggle('on', b===rr)); renderReal(); return; }
+  if (e.target.id === 'ordReload') { loadOrders(); return; }
+  const tr = e.target.closest('tr[data-ord]'); if (tr && !e.target.closest('select')) { const d = document.querySelector(`[data-odet="${tr.dataset.ord}"]`); if (d) d.hidden = !d.hidden; }
+  const v = e.target.closest('#views [data-v]'); if (v && IS_ADMIN && ['back','dash'].includes(v.dataset.v)) loadOrders();
+});
+document.addEventListener('change', async e => {
+  const id = e.target.dataset?.os; if (!id || !IS_ADMIN) return;
+  const { error } = await sb.from('orders').update({ status: e.target.value }).eq('id', id);
+  if (error) { toast('❌ เปลี่ยนสถานะไม่สำเร็จ'); return; }
+  const o = ORDERS.find(x => String(x.id) === id); if (o) o.status = e.target.value;
+  toast('อัปเดตสถานะ #' + id + ' แล้ว'); renderOrders(); renderPrep(); renderReal();
+});
+// แจ้งเตือนออเดอร์ใหม่แบบเรียลไทม์
+sb.channel('orders-live').on('postgres_changes', { event:'INSERT', schema:'public', table:'orders' }, p => {
+  if (!IS_ADMIN) return; if (p.new.channel === 'online') toast('🔔 ออเดอร์ใหม่ #' + p.new.id); loadOrders();
+}).subscribe();
+// โหลดออเดอร์หลังล็อกอิน
+const _refreshAuth = refreshAuth;
+refreshAuth = async function(){ await _refreshAuth(); if (IS_ADMIN) loadOrders(); };
