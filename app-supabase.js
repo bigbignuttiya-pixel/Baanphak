@@ -552,7 +552,7 @@ let LCFG = null;
 })();
 async function loadLine(){
   if (!IS_ADMIN) return;
-  const { data, error } = await sb.from('line_config').select('channel_token,channel_secret,targets,notify_pos,notify_online,notify_paid,last_error,last_sent_at').eq('id',1).maybeSingle();
+  const { data, error } = await sb.from('line_config').select('channel_token,channel_secret,targets,notify_pos,notify_online,notify_paid,last_error,last_sent_at,hook_secret').eq('id',1).maybeSingle();
   if (error) { console.error(error); return; }
   LCFG = data || {}; renderLine();
 }
@@ -570,7 +570,7 @@ function renderLine(){
         <li>กดลิงก์ <a href="https://developers.line.biz/console/" target="_blank" rel="noopener">LINE Developers</a> → เลือก Channel ร้าน → แท็บ <b>Messaging API</b> → เลื่อนลงล่างสุด กด <b>Issue</b> ที่ Channel access token → คัดลอกมาวาง</li>
         <li>กด <b>💾 บันทึก</b> — ระบบจะตั้ง Webhook ให้อัตโนมัติ</li>
         <li>กลับไป LINE OA Manager → <b>ตั้งค่าการตอบกลับ</b> → เปิด <b>Webhook</b> (และปิดข้อความตอบกลับอัตโนมัติถ้าไม่ต้องการ)</li>
-        <li>แอดเพื่อน LINE ร้าน (หรือเชิญเข้ากลุ่มพนักงาน) แล้วพิมพ์ <b>เชื่อมต่อ</b> → กด <b>🔔 ส่งข้อความทดสอบ</b></li>
+        <li>แอดเพื่อน LINE ร้าน (หรือเชิญเข้ากลุ่มพนักงาน) แล้วพิมพ์ <b>เชื่อมต่อ ${String(c.hook_secret||'').slice(0,6)}</b> (รหัสนี้ให้เฉพาะคนในร้าน) → กด <b>🔔 ส่งข้อความทดสอบ</b></li>
         <li style="list-style:none;margin-left:-20px" class="meta">Webhook URL (ระบบตั้งให้เอง): <code style="font-size:11px;word-break:break-all">${LINE_HOOK}</code> <button class="btn sm ghost" id="lnCopy">คัดลอก</button></li>
 </ol></details>
     <label class="meta">Channel access token</label><input id="lnTok" type="password" autocomplete="off" placeholder="${c.channel_token?'•••••• (บันทึกแล้ว — วางใหม่เพื่อเปลี่ยน)':'วาง Channel access token'}" style="${fld}">

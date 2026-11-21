@@ -82,7 +82,13 @@ Deno.serve(async (req) => {
     for (const e of events) {
       const src = e.source || {}; const id = src.groupId || src.roomId || src.userId; const type = src.groupId ? "group" : src.roomId ? "room" : "user";
       const text = e.type === "message" && e.message?.type === "text" ? String(e.message.text).trim() : "";
-      const join = e.type === "join" || e.type === "follow" || /เชื่อม|เปิดแจ้งเตือน/.test(text);
+      // ต้องพิมพ์ "เชื่อมต่อ <รหัส 6 หลักจากหลังบ้าน>" เท่านั้น กันลูกค้าที่แอดเพื่อนร้านได้รับออเดอร์ของคนอื่น
+      const m = text.match(/^(?:เชื่อมต่อ|เปิดแจ้งเตือน)\s*([A-Za-z0-9]*)/);
+      const join = Boolean(m && m[1].toLowerCase() === String(c.hook_secret || "").slice(0, 6).toLowerCase());
+      if (m && !join && e.replyToken) {
+        await lineApi(c.channel_token, "reply", { replyToken: e.replyToken, messages: [{ type: "text", text: "🔐 พิมพ์ \"เชื่อมต่อ\" ตามด้วยรหัส 6 หลักจากหน้าหลังบ้าน" }] });
+        continue;
+      }
       const leave = e.type === "leave" || e.type === "unfollow" || /ยกเลิกแจ้งเตือน|ปิดแจ้งเตือน/.test(text);
       if (join && id && !targets.some((t) => t.id === id)) {
         targets = [...targets, { id, type, added: new Date().toISOString() }];
@@ -91,7 +97,7 @@ Deno.serve(async (req) => {
         targets = targets.filter((t) => t.id !== id);
         if (e.replyToken && e.type === "message") await lineApi(c.channel_token, "reply", { replyToken: e.replyToken, messages: [{ type: "text", text: "🔕 หยุดแจ้งเตือนที่นี่แล้ว" }] });
       } else if (text && e.replyToken && /สถานะ|ทดสอบ/.test(text)) {
-        await lineApi(c.channel_token, "reply", { replyToken: e.replyToken, messages: [{ type: "text", text: targets.some((t) => t.id === id) ? "🟢 ที่นี่เชื่อมต่อแจ้งเตือนอยู่" : "⚪ ยังไม่เชื่อมต่อ พิมพ์ \"เชื่อมต่อ\"" }] });
+        await lineApi(c.channel_token, "reply", { replyToken: e.replyToken, messages: [{ type: "text", text: targets.some((t) => t.id === id) ? "🟢 ที่นี่เชื่อมต่อแจ้งเตือนอยู่" : "⚪ ยังไม่เชื่อมต่อ พิมพ์ \"เชื่อมต่อ\" ตามด้วยรหัสจากหลังบ้าน" }] });
       }
     }
     await db.from("line_config").update({ targets, updated_at: new Date().toISOString() }).eq("id", 1);
