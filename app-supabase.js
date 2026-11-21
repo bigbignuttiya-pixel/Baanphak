@@ -565,13 +565,14 @@ function renderLine(){
     ${c.last_error?`<div style="color:#c62828;font-size:13px;margin:4px 0">⚠️ ส่งไม่สำเร็จล่าสุด: ${esc(c.last_error.slice(0,160))}</div>`:''}
     <details ${ok?'':'open'} style="margin:8px 0"><summary style="cursor:pointer;font-family:Prompt">📋 วิธีตั้งค่า (ทำครั้งเดียว)</summary>
       <ol style="padding-left:20px;line-height:1.7;margin:6px 0">
-        <li>สร้าง <b>LINE Official Account</b> ของร้าน (ฟรี) ที่ <a href="https://manager.line.biz" target="_blank" rel="noopener">manager.line.biz</a></li>
-        <li>ในหน้า OA → ตั้งค่า → <b>Messaging API</b> → กดเปิดใช้งาน</li>
-        <li>เข้า <a href="https://developers.line.biz/console/" target="_blank" rel="noopener">LINE Developers</a> → เลือก Channel → แท็บ <b>Basic settings</b> คัดลอก <b>Channel secret</b> · แท็บ <b>Messaging API</b> กด Issue <b>Channel access token</b> แล้วคัดลอก</li>
-        <li>วางทั้งสองค่าด้านล่าง กดบันทึก</li>
-        <li>แท็บ Messaging API → <b>Webhook URL</b> วางลิงก์นี้ แล้วเปิด <b>Use webhook</b><br><code style="font-size:11.5px;word-break:break-all">${LINE_HOOK}</code> <button class="btn sm ghost" id="lnCopy">คัดลอก</button></li>
-        <li>เพิ่มเพื่อน LINE OA ของร้าน (หรือเชิญเข้ากลุ่มพนักงาน) แล้วพิมพ์ <b>เชื่อมต่อ</b> — ระบบจะตอบกลับว่าเชื่อมแล้ว</li>
-        <li>กด <b>🔔 ส่งข้อความทดสอบ</b></li></ol></details>
+        <li>เปิด <a href="https://manager.line.biz" target="_blank" rel="noopener">LINE Official Account Manager</a> → เลือกบัญชีร้าน → <b>ตั้งค่า</b> → <b>Messaging API</b> → กด <b>เปิดใช้ Messaging API</b> (ตั้งชื่อผู้ให้บริการเป็นอะไรก็ได้)</li>
+        <li>หน้าเดียวกันจะเห็น <b>Channel secret</b> → คัดลอกมาวางช่องด้านล่าง</li>
+        <li>กดลิงก์ <a href="https://developers.line.biz/console/" target="_blank" rel="noopener">LINE Developers</a> → เลือก Channel ร้าน → แท็บ <b>Messaging API</b> → เลื่อนลงล่างสุด กด <b>Issue</b> ที่ Channel access token → คัดลอกมาวาง</li>
+        <li>กด <b>💾 บันทึก</b> — ระบบจะตั้ง Webhook ให้อัตโนมัติ</li>
+        <li>กลับไป LINE OA Manager → <b>ตั้งค่าการตอบกลับ</b> → เปิด <b>Webhook</b> (และปิดข้อความตอบกลับอัตโนมัติถ้าไม่ต้องการ)</li>
+        <li>แอดเพื่อน LINE ร้าน (หรือเชิญเข้ากลุ่มพนักงาน) แล้วพิมพ์ <b>เชื่อมต่อ</b> → กด <b>🔔 ส่งข้อความทดสอบ</b></li>
+        <li style="list-style:none;margin-left:-20px" class="meta">Webhook URL (ระบบตั้งให้เอง): <code style="font-size:11px;word-break:break-all">${LINE_HOOK}</code> <button class="btn sm ghost" id="lnCopy">คัดลอก</button></li>
+</ol></details>
     <label class="meta">Channel access token</label><input id="lnTok" type="password" autocomplete="off" placeholder="${c.channel_token?'•••••• (บันทึกแล้ว — วางใหม่เพื่อเปลี่ยน)':'วาง Channel access token'}" style="${fld}">
     <label class="meta">Channel secret</label><input id="lnSec" type="password" autocomplete="off" placeholder="${c.channel_secret?'•••••• (บันทึกแล้ว)':'วาง Channel secret'}" style="${fld}">
     <div style="margin:8px 0;line-height:2">
@@ -590,7 +591,16 @@ document.addEventListener('click', async e => {
     if (t) upd.channel_token = t; if (s) upd.channel_secret = s;
     const { error } = await sb.from('line_config').update(upd).eq('id',1);
     if (error) { toast('❌ บันทึกไม่สำเร็จ'); console.error(error); return; }
-    toast('💾 บันทึกการตั้งค่า LINE แล้ว'); loadLine();
+    if (t) {
+      toast('กำลังเชื่อม LINE…');
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        const r = await fetch(LINE_HOOK, { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+session.access_token, apikey: SB_KEY }, body: JSON.stringify({ action:'setup' }) });
+        const j = await r.json();
+        toast(j.ok ? '✅ เชื่อมบัญชี '+(j.bot||'LINE OA')+' แล้ว · ตั้ง Webhook ให้อัตโนมัติ' : '❌ '+(j.error||'ตั้งค่าไม่สำเร็จ'));
+      } catch(err) { toast('❌ เชื่อม LINE ไม่สำเร็จ'); console.error(err); }
+    } else toast('💾 บันทึกการตั้งค่า LINE แล้ว');
+    loadLine();
   }
   const rm = e.target.closest('[data-lnrm]');
   if (rm) { const targets = (LCFG.targets||[]).filter(t => t.id !== rm.dataset.lnrm);

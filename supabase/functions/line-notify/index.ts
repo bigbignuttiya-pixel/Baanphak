@@ -105,6 +105,15 @@ Deno.serve(async (req) => {
     const { data: isAdmin } = await u.rpc("is_admin");
     if (!isAdmin) return json({ error: "admin only" }, 403);
     if (!c?.channel_token) return json({ error: "ยังไม่ได้ใส่ Channel access token" }, 400);
+    const body = JSON.parse(raw || "{}");
+    if (body.action === "setup") {   // ตั้ง Webhook URL ให้อัตโนมัติ
+      const ep = URL_ + "/functions/v1/line-notify";
+      const r = await fetch("https://api.line.me/v2/bot/channel/webhook/endpoint", { method: "PUT", headers: { "Content-Type": "application/json", Authorization: "Bearer " + c.channel_token }, body: JSON.stringify({ endpoint: ep }) });
+      if (!r.ok) return json({ ok: false, error: "ตั้ง Webhook ไม่สำเร็จ (" + r.status + ") — ตรวจ Channel access token อีกครั้ง" });
+      const bi = await fetch("https://api.line.me/v2/bot/info", { headers: { Authorization: "Bearer " + c.channel_token } });
+      const info = bi.ok ? await bi.json() : {};
+      return json({ ok: true, bot: info.displayName || "", basicId: info.basicId || "" });
+    }
     if (!(c.targets || []).length) return json({ error: "ยังไม่มีผู้รับ — แอดเพื่อน LINE ร้านแล้วพิมพ์ \"เชื่อมต่อ\"" }, 400);
     const errs = await pushAll(c, "🔔 ทดสอบแจ้งเตือนจากบ้านผัก\nถ้าเห็นข้อความนี้ แปลว่าระบบส่งบิลเข้า LINE พร้อมใช้งานแล้ว ✅");
     return json({ ok: errs.length === 0, errs });
