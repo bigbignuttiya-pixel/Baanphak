@@ -540,3 +540,72 @@ document.addEventListener('change', async e => { const id = e.target.dataset?.le
 document.addEventListener('click', e => { if (e.target.id==='supReload') loadLeads(); const v = e.target.closest('#views [data-v]'); if (v && v.dataset.v==='back') setTimeout(loadLeads, 60); });
 const _refreshAuth3 = refreshAuth;
 refreshAuth = async function(){ await _refreshAuth3(); if (IS_ADMIN) loadLeads(); };
+
+/* =========================================================
+   12) แจ้งเตือน LINE ร้าน (บิลหน้าร้าน / ออเดอร์ / ชำระเงิน)
+   ========================================================= */
+const LINE_HOOK = 'https://frtcdigitkwpuzafwdlf.supabase.co/functions/v1/line-notify';
+let LCFG = null;
+(function(){
+  document.getElementById('shopForm').previousElementSibling.insertAdjacentHTML('beforebegin',
+    `<div class="sec-h" style="margin-top:20px"><h2>🔔 แจ้งเตือนเข้า LINE ร้าน</h2></div><div class="panel" id="lineBox"><span class="meta">กำลังโหลด…</span></div>`);
+})();
+async function loadLine(){
+  if (!IS_ADMIN) return;
+  const { data, error } = await sb.from('line_config').select('channel_token,channel_secret,targets,notify_pos,notify_online,notify_paid,last_error,last_sent_at').eq('id',1).maybeSingle();
+  if (error) { console.error(error); return; }
+  LCFG = data || {}; renderLine();
+}
+function renderLine(){
+  const b = document.getElementById('lineBox'); if (!b || !LCFG) return;
+  const c = LCFG, ok = c.channel_token && c.channel_secret, tg = c.targets || [];
+  const st = !ok ? '⚪ ยังไม่ได้ตั้งค่า' : !tg.length ? '🟡 ตั้งค่าแล้ว — รอเชื่อมต่อผู้รับ' : '🟢 พร้อมใช้งาน · ส่งถึง '+tg.length+' ที่';
+  b.innerHTML = `<div style="font-family:Prompt;margin-bottom:6px">${st}</div>
+    ${c.last_sent_at?`<div class="meta">ส่งล่าสุด ${new Date(c.last_sent_at).toLocaleString('th-TH')}</div>`:''}
+    ${c.last_error?`<div style="color:#c62828;font-size:13px;margin:4px 0">⚠️ ส่งไม่สำเร็จล่าสุด: ${esc(c.last_error.slice(0,160))}</div>`:''}
+    <details ${ok?'':'open'} style="margin:8px 0"><summary style="cursor:pointer;font-family:Prompt">📋 วิธีตั้งค่า (ทำครั้งเดียว)</summary>
+      <ol style="padding-left:20px;line-height:1.7;margin:6px 0">
+        <li>สร้าง <b>LINE Official Account</b> ของร้าน (ฟรี) ที่ <a href="https://manager.line.biz" target="_blank" rel="noopener">manager.line.biz</a></li>
+        <li>ในหน้า OA → ตั้งค่า → <b>Messaging API</b> → กดเปิดใช้งาน</li>
+        <li>เข้า <a href="https://developers.line.biz/console/" target="_blank" rel="noopener">LINE Developers</a> → เลือก Channel → แท็บ <b>Basic settings</b> คัดลอก <b>Channel secret</b> · แท็บ <b>Messaging API</b> กด Issue <b>Channel access token</b> แล้วคัดลอก</li>
+        <li>วางทั้งสองค่าด้านล่าง กดบันทึก</li>
+        <li>แท็บ Messaging API → <b>Webhook URL</b> วางลิงก์นี้ แล้วเปิด <b>Use webhook</b><br><code style="font-size:11.5px;word-break:break-all">${LINE_HOOK}</code> <button class="btn sm ghost" id="lnCopy">คัดลอก</button></li>
+        <li>เพิ่มเพื่อน LINE OA ของร้าน (หรือเชิญเข้ากลุ่มพนักงาน) แล้วพิมพ์ <b>เชื่อมต่อ</b> — ระบบจะตอบกลับว่าเชื่อมแล้ว</li>
+        <li>กด <b>🔔 ส่งข้อความทดสอบ</b></li></ol></details>
+    <label class="meta">Channel access token</label><input id="lnTok" type="password" autocomplete="off" placeholder="${c.channel_token?'•••••• (บันทึกแล้ว — วางใหม่เพื่อเปลี่ยน)':'วาง Channel access token'}" style="${fld}">
+    <label class="meta">Channel secret</label><input id="lnSec" type="password" autocomplete="off" placeholder="${c.channel_secret?'•••••• (บันทึกแล้ว)':'วาง Channel secret'}" style="${fld}">
+    <div style="margin:8px 0;line-height:2">
+      <label><input type="checkbox" id="lnPos" ${c.notify_pos!==false?'checked':''}> 🧾 บิลหน้าร้านชำระเสร็จ</label><br>
+      <label><input type="checkbox" id="lnOn" ${c.notify_online!==false?'checked':''}> 🛒 ออเดอร์ออนไลน์ใหม่</label><br>
+      <label><input type="checkbox" id="lnPaid" ${c.notify_paid!==false?'checked':''}> 📎 ลูกค้าแนบสลิป / ✅ ยืนยันรับเงิน</label></div>
+    ${tg.length?`<div class="meta" style="margin-top:4px">ผู้รับแจ้งเตือน:</div>${tg.map(t=>`<div style="display:flex;gap:8px;align-items:center;margin:3px 0">${t.type==='user'?'👤 บุคคล':'👥 กลุ่ม'} <code style="font-size:11px">…${esc(String(t.id).slice(-6))}</code> <button class="btn sm ghost" data-lnrm="${esc(t.id)}">ลบ</button></div>`).join('')}`:''}
+    <div class="two" style="margin-top:10px"><button class="btn" id="lnSave">💾 บันทึก</button><button class="btn ghost" id="lnTest" ${ok&&tg.length?'':'disabled'}>🔔 ส่งข้อความทดสอบ</button></div>`;
+}
+document.addEventListener('click', async e => {
+  if (!IS_ADMIN) return;
+  if (e.target.id === 'lnCopy') { try { await navigator.clipboard.writeText(LINE_HOOK); toast('คัดลอกลิงก์แล้ว'); } catch { toast('คัดลอกไม่ได้ — กดค้างที่ลิงก์เพื่อคัดลอก'); } }
+  if (e.target.id === 'lnSave') {
+    const upd = { notify_pos: $('#lnPos').checked, notify_online: $('#lnOn').checked, notify_paid: $('#lnPaid').checked, updated_at: new Date().toISOString() };
+    const t = $('#lnTok').value.trim(), s = $('#lnSec').value.trim();
+    if (t) upd.channel_token = t; if (s) upd.channel_secret = s;
+    const { error } = await sb.from('line_config').update(upd).eq('id',1);
+    if (error) { toast('❌ บันทึกไม่สำเร็จ'); console.error(error); return; }
+    toast('💾 บันทึกการตั้งค่า LINE แล้ว'); loadLine();
+  }
+  const rm = e.target.closest('[data-lnrm]');
+  if (rm) { const targets = (LCFG.targets||[]).filter(t => t.id !== rm.dataset.lnrm);
+    const { error } = await sb.from('line_config').update({ targets }).eq('id',1); if (!error) { LCFG.targets = targets; renderLine(); toast('ลบผู้รับแล้ว'); } }
+  if (e.target.id === 'lnTest') {
+    e.target.disabled = true; e.target.textContent = 'กำลังส่ง…';
+    const { data: { session } } = await sb.auth.getSession();
+    try {
+      const r = await fetch(LINE_HOOK, { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+session.access_token, apikey: SB_KEY }, body:'{}' });
+      const j = await r.json();
+      toast(j.ok ? '✅ ส่งข้อความทดสอบแล้ว — เช็ก LINE ได้เลย' : '❌ ' + (j.error || (j.errs||[]).join(' ').slice(0,120)));
+    } catch(err) { toast('❌ ส่งไม่สำเร็จ'); console.error(err); }
+    loadLine();
+  }
+  const v = e.target.closest('#views [data-v]'); if (v && v.dataset.v==='back') setTimeout(loadLine, 80);
+});
+const _refreshAuth4 = refreshAuth;
+refreshAuth = async function(){ await _refreshAuth4(); if (IS_ADMIN) loadLine(); };
