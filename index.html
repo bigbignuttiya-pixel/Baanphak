@@ -4,8 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>บ้านผัก — จากสวนถึงครัวคุณ</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="icon-512.png">
+<meta name="theme-color" content="#2E6B34">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@600&family=Prompt:wght@400;500;600;700&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#f6f4ec; --card:#fff; --ink:#1f2a1c; --muted:#6b7563; --line:#e5e1d3;
@@ -19,6 +22,7 @@ button{font:inherit;cursor:pointer}
 /* top bar */
 .top{position:sticky;top:0;z-index:20;background:var(--green);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:12px}
 .brand{font-weight:700;font-size:20px;display:flex;align-items:center;gap:8px}
+.bmark{width:34px;height:34px;flex:none}.brand .bn{font-family:'Mitr','Prompt',sans-serif;font-weight:600}
 .brand small{font-weight:400;font-size:12px;opacity:.8;display:block;line-height:1}
 .views{margin-left:auto;display:flex;gap:4px;background:rgba(255,255,255,.12);padding:3px;border-radius:999px}
 .views button{border:0;background:transparent;color:#fff;padding:6px 12px;border-radius:999px;font-family:'Prompt';font-size:13px}
@@ -263,7 +267,7 @@ body.admin .views{display:flex;order:5;width:100%;margin:0;justify-content:cente
 </head>
 <body>
 <div class="top">
-  <div class="brand">🥬 <span class="bn">บ้านผัก</span> <small>Baan Phak<br>จากสวนถึงครัวคุณ</small></div>
+  <div class="brand"><svg class="bmark" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><g><path d="M60 8 Q63 8 66 10.5 L109 47 Q114 52 108 56 L104 56 L104 102 Q104 112 94 112 L26 112 Q16 112 16 102 L16 56 L12 56 Q6 52 11 47 L54 10.5 Q57 8 60 8 Z" fill="#FFFFFF"/><path d="M60 100 L60 72" stroke="#2E6B34" stroke-width="6" stroke-linecap="round" fill="none"/><path d="M60 76 C43 78 32 66 34 50 C50 49 61 58 60 76 Z" fill="#8BC34A"/><path d="M60 70 C61 51 75 40 92 43 C93 61 79 72 60 70 Z" fill="#2E6B34"/></g></svg> <span class="bn">บ้านผัก</span> <small>Baan Phak<br>จากสวนถึงครัวคุณ</small></div>
   <div class="views" id="views">
     <button data-v="shop" class="on">หน้าร้าน</button>
     <button data-v="pos">เคาน์เตอร์</button>
