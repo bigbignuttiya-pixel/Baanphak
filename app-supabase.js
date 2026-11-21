@@ -466,7 +466,7 @@ function renderShopInfo(){
   if (S.open_hours) L.push(`🕘 <b>เวลาเปิด</b> ${esc(S.open_hours)}`);
   if (S.phone) L.push(`📞 <b>โทร</b> <a href="${telHref(S.phone)}">${esc(S.phone)}</a>`);
   if (S.line_id) { const u = /^https:\/\/(line\.me|lin\.ee)\//.test(S.line_id) ? S.line_id : 'https://line.me/R/ti/p/'+encodeURIComponent(S.line_id.startsWith('@')?S.line_id:'~'+S.line_id); L.push(`💬 <b>LINE</b> <a href="${esc(u)}" target="_blank" rel="noopener">${/^https:/.test(S.line_id)?'แอดไลน์ร้าน':esc(S.line_id)}</a>`); }
-  if (S.facebook) L.push(`📘 <b>Facebook</b> <a href="${/^https?:/.test(S.facebook)?esc(S.facebook):'https://www.facebook.com/search/top?q='+encodeURIComponent(S.facebook)}" target="_blank" rel="noopener">${esc(S.facebook.replace(/^https?:\/\/(www\.)?facebook\.com\//,''))}</a>`);
+  if (S.facebook) L.push(`📘 <b>Facebook</b> <a href="${/^https?:/.test(S.facebook)?esc(S.facebook):'https://www.facebook.com/search/top?q='+encodeURIComponent(S.facebook)}" target="_blank" rel="noopener">${/^https?:/.test(S.facebook)?'เพจร้าน':esc(S.facebook)}</a>`);
   if (S.address) L.push(`📍 <b>ที่ตั้ง</b> ${esc(S.address)}${S.map_url?` · <a href="${/^https?:/.test(S.map_url)?esc(S.map_url):'#'}" target="_blank" rel="noopener">เปิดแผนที่</a>`:''}`);
   if (S.delivery_area) L.push(`🛵 <b>จัดส่ง</b> ${esc(S.delivery_area)}`);
   box.innerHTML = `<h2>🥬 ${esc(S.name||'บ้านผัก')} <small class="meta" style="font-size:13px">${esc(S.tagline||'')}</small></h2>
