@@ -465,7 +465,7 @@ function renderShopInfo(){
   const S = SHOP, L = [];
   if (S.open_hours) L.push(`🕘 <b>เวลาเปิด</b> ${esc(S.open_hours)}`);
   if (S.phone) L.push(`📞 <b>โทร</b> <a href="${telHref(S.phone)}">${esc(S.phone)}</a>`);
-  if (S.line_id) L.push(`💬 <b>LINE</b> <a href="https://line.me/R/ti/p/${encodeURIComponent(S.line_id.startsWith('@')?S.line_id:'~'+S.line_id)}" target="_blank" rel="noopener">${esc(S.line_id)}</a>`);
+  if (S.line_id) { const u = /^https:\/\/(line\.me|lin\.ee)\//.test(S.line_id) ? S.line_id : 'https://line.me/R/ti/p/'+encodeURIComponent(S.line_id.startsWith('@')?S.line_id:'~'+S.line_id); L.push(`💬 <b>LINE</b> <a href="${esc(u)}" target="_blank" rel="noopener">${/^https:/.test(S.line_id)?'แอดไลน์ร้าน':esc(S.line_id)}</a>`); }
   if (S.facebook) L.push(`📘 <b>Facebook</b> <a href="${/^https?:/.test(S.facebook)?esc(S.facebook):'https://www.facebook.com/search/top?q='+encodeURIComponent(S.facebook)}" target="_blank" rel="noopener">${esc(S.facebook.replace(/^https?:\/\/(www\.)?facebook\.com\//,''))}</a>`);
   if (S.address) L.push(`📍 <b>ที่ตั้ง</b> ${esc(S.address)}${S.map_url?` · <a href="${/^https?:/.test(S.map_url)?esc(S.map_url):'#'}" target="_blank" rel="noopener">เปิดแผนที่</a>`:''}`);
   if (S.delivery_area) L.push(`🛵 <b>จัดส่ง</b> ${esc(S.delivery_area)}`);
@@ -477,7 +477,7 @@ function renderShopInfo(){
     <details><summary>💳 การชำระเงิน</summary><div style="margin-top:6px">พร้อมเพย์ (สแกน QR ตามยอด แล้วแนบสลิปได้ทันที) · เก็บเงินปลายทาง · จ่ายที่ร้าน</div></details>`;
 }
 async function loadShopInfo(){ const { data } = await sb.from('shop_info').select('*').eq('id',1).maybeSingle(); if (data) SHOP = data; renderShopInfo(); renderShopForm(); }
-const SF = [['name','ชื่อร้าน'],['tagline','สโลแกน'],['about','เกี่ยวกับร้าน',1],['phone','เบอร์โทร'],['line_id','LINE ID (เช่น @baanphak)'],['facebook','Facebook (ชื่อเพจหรือลิงก์)'],
+const SF = [['name','ชื่อร้าน'],['tagline','สโลแกน'],['about','เกี่ยวกับร้าน',1],['phone','เบอร์โทร'],['line_id','LINE (ID เช่น @baanphak หรือลิงก์ line.me)'],['facebook','Facebook (ชื่อเพจหรือลิงก์)'],
   ['open_hours','เวลาเปิด-ปิด'],['address','ที่ตั้งร้าน',1],['map_url','ลิงก์ Google Maps'],['delivery_area','พื้นที่/เงื่อนไขจัดส่ง',1],['policy','นโยบายเปลี่ยน/คืนสินค้า',1],['supplier_text','ข้อความเชิญซัพพลายเออร์',1]];
 (function(){
   document.getElementById('v-back').insertAdjacentHTML('beforeend', `<div class="sec-h" style="margin-top:20px"><h2>ℹ️ ข้อมูลร้าน (แสดงท้ายหน้าร้าน)</h2></div><div class="panel" id="shopForm"></div>`);
