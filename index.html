@@ -739,6 +739,9 @@ let cart = {};          // key -> qty   (veg: qty in 100g units)
 let pick = {};          // veg chosen grams before adding (in 100g units)
 let curCat = 'all', query = '';
 
+// เมนูที่ปิดขายไว้ (ยังไม่มีรูป)
+const HIDDEN_KITS = ['c-mix','c-orange','c-guava','c-mamuang','c-chompu','c-thaimix','c-pomelo','c-durian','c-jack','c-mangosteen','c-taengthai','c-duo','c-reddragon','c-berry','c-cup','c-skewer','c-mango'];
+for (let i = KITS.length - 1; i >= 0; i--) if (HIDDEN_KITS.includes(KITS[i].id)) KITS.splice(i, 1);
 /* ============ SHOP RENDER ============ */
 function renderCats(){
   const all = [{id:'all',name:'ทั้งหมด'},...CATS];
