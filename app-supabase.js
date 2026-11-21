@@ -466,17 +466,19 @@ function renderShopInfo(){
   if (S.open_hours) L.push(`🕘 <b>เวลาเปิด</b> ${esc(S.open_hours)}`);
   if (S.phone) L.push(`📞 <b>โทร</b> <a href="${telHref(S.phone)}">${esc(S.phone)}</a>`);
   if (S.line_id) L.push(`💬 <b>LINE</b> <a href="https://line.me/R/ti/p/${encodeURIComponent(S.line_id.startsWith('@')?S.line_id:'~'+S.line_id)}" target="_blank" rel="noopener">${esc(S.line_id)}</a>`);
-  if (S.facebook) L.push(`📘 <b>Facebook</b> <a href="${/^https?:/.test(S.facebook)?esc(S.facebook):'https://facebook.com/'+encodeURIComponent(S.facebook)}" target="_blank" rel="noopener">${esc(S.facebook.replace(/^https?:\/\/(www\.)?facebook\.com\//,''))}</a>`);
+  if (S.facebook) L.push(`📘 <b>Facebook</b> <a href="${/^https?:/.test(S.facebook)?esc(S.facebook):'https://www.facebook.com/search/top?q='+encodeURIComponent(S.facebook)}" target="_blank" rel="noopener">${esc(S.facebook.replace(/^https?:\/\/(www\.)?facebook\.com\//,''))}</a>`);
   if (S.address) L.push(`📍 <b>ที่ตั้ง</b> ${esc(S.address)}${S.map_url?` · <a href="${/^https?:/.test(S.map_url)?esc(S.map_url):'#'}" target="_blank" rel="noopener">เปิดแผนที่</a>`:''}`);
   if (S.delivery_area) L.push(`🛵 <b>จัดส่ง</b> ${esc(S.delivery_area)}`);
   box.innerHTML = `<h2>🥬 ${esc(S.name||'บ้านผัก')} <small class="meta" style="font-size:13px">${esc(S.tagline||'')}</small></h2>
     ${S.about?`<div>${esc(S.about)}</div>`:''}<div class="row2">${L.map(x=>`<div>${x}</div>`).join('')}</div>
     ${S.policy?`<details><summary>🔄 นโยบายเปลี่ยน/คืนสินค้า</summary><div style="white-space:pre-line;margin-top:6px">${esc(S.policy)}</div></details>`:''}
+    <div class="supbox"><b>🤝 ร่วมเป็นซัพพลายเออร์กับบ้านผัก</b><div class="meta" style="margin:4px 0 8px">${esc(S.supplier_text||'เกษตรกรหรือผู้ผลิตที่อยากส่งสินค้าให้ร้าน ฝากข้อมูลไว้ได้เลย')}</div>
+      <button class="btn sm" id="supOpen">📝 ฝากข้อมูลติดต่อ</button>${S.phone?` <a class="btn sm ghost" href="${telHref(S.phone)}">📞 โทรคุยกับร้าน</a>`:''}</div>
     <details><summary>💳 การชำระเงิน</summary><div style="margin-top:6px">พร้อมเพย์ (สแกน QR ตามยอด แล้วแนบสลิปได้ทันที) · เก็บเงินปลายทาง · จ่ายที่ร้าน</div></details>`;
 }
 async function loadShopInfo(){ const { data } = await sb.from('shop_info').select('*').eq('id',1).maybeSingle(); if (data) SHOP = data; renderShopInfo(); renderShopForm(); }
 const SF = [['name','ชื่อร้าน'],['tagline','สโลแกน'],['about','เกี่ยวกับร้าน',1],['phone','เบอร์โทร'],['line_id','LINE ID (เช่น @baanphak)'],['facebook','Facebook (ชื่อเพจหรือลิงก์)'],
-  ['open_hours','เวลาเปิด-ปิด'],['address','ที่ตั้งร้าน',1],['map_url','ลิงก์ Google Maps'],['delivery_area','พื้นที่/เงื่อนไขจัดส่ง',1],['policy','นโยบายเปลี่ยน/คืนสินค้า',1]];
+  ['open_hours','เวลาเปิด-ปิด'],['address','ที่ตั้งร้าน',1],['map_url','ลิงก์ Google Maps'],['delivery_area','พื้นที่/เงื่อนไขจัดส่ง',1],['policy','นโยบายเปลี่ยน/คืนสินค้า',1],['supplier_text','ข้อความเชิญซัพพลายเออร์',1]];
 (function(){
   document.getElementById('v-back').insertAdjacentHTML('beforeend', `<div class="sec-h" style="margin-top:20px"><h2>ℹ️ ข้อมูลร้าน (แสดงท้ายหน้าร้าน)</h2></div><div class="panel" id="shopForm"></div>`);
 })();
@@ -496,3 +498,45 @@ document.addEventListener('click', async e => {
 loadShopInfo().catch(console.warn);
 const _refreshAuth2 = refreshAuth;
 refreshAuth = async function(){ await _refreshAuth2(); if (IS_ADMIN) { renderStock(); renderShopForm(); } };
+
+/* ---------- 11) ซัพพลายเออร์ร่วมงาน ---------- */
+document.head.insertAdjacentHTML('beforeend','<style>.supbox{margin-top:12px;background:#f3f8ef;border:1px solid #d7e8cc;border-radius:12px;padding:12px 14px}</style>');
+document.addEventListener('click', e => {
+  if (e.target.id !== 'supOpen') return;
+  const f = (id, ph, t='') => `<input id="${id}" placeholder="${ph}" ${t} style="${fld}">`;
+  openModal(`<h3>🤝 ร่วมเป็นซัพพลายเออร์กับบ้านผัก</h3>
+    ${f('spName','ชื่อผู้ติดต่อ *')}${f('spFarm','ชื่อสวน / ฟาร์ม / บริษัท')}${f('spPhone','เบอร์โทร *','inputmode="tel"')}${f('spLine','LINE ID')}
+    <textarea id="spProd" rows="2" placeholder="สินค้าที่ส่งได้ เช่น ผักบุ้ง คะน้า 50 กก./สัปดาห์" style="${fld};resize:vertical"></textarea>
+    ${f('spArea','จังหวัด / พื้นที่')}<textarea id="spNote" rows="2" placeholder="รายละเอียดเพิ่มเติม (ปลอดสาร, GAP, ราคาโดยประมาณ ฯลฯ)" style="${fld};resize:vertical"></textarea>
+    <div class="two" style="margin-top:8px"><button class="btn" id="spSend">ส่งข้อมูล</button><button class="btn ghost" data-close>ยกเลิก</button></div>`);
+});
+document.addEventListener('click', async e => {
+  if (e.target.id !== 'spSend') return;
+  const v = id => (document.getElementById(id)?.value || '').trim();
+  const row = { name:v('spName'), farm:v('spFarm')||null, phone:v('spPhone'), line_id:v('spLine')||null, products:v('spProd')||null, area:v('spArea')||null, note:v('spNote')||null };
+  if (!row.name || row.phone.replace(/\D/g,'').length < 9) { toast('กรอกชื่อและเบอร์โทรให้ครบก่อน'); return; }
+  e.target.disabled = true;
+  const { error } = await sb.from('supplier_leads').insert(row);
+  if (error) { e.target.disabled = false; toast('❌ ส่งไม่สำเร็จ ลองใหม่อีกครั้ง'); console.error(error); return; }
+  closeModal(); toast('✅ ส่งข้อมูลแล้ว ร้านจะติดต่อกลับเร็วๆ นี้');
+});
+// หลังบ้าน: รายชื่อซัพพลายเออร์ที่ติดต่อมา
+(function(){
+  document.getElementById('shopForm').previousElementSibling.insertAdjacentHTML('beforebegin', `<div class="sec-h" style="margin-top:20px"><h2>🤝 ซัพพลายเออร์ที่ติดต่อมา</h2><span><button class="btn sm ghost" id="supReload">↻ โหลดใหม่</button></span></div><div class="tw" style="margin-bottom:12px"><table class="tbl" id="supTbl" style="min-width:0"></table></div>`);
+})();
+const SUPST = { new:'🆕 ใหม่', contacted:'📞 ติดต่อแล้ว', partner:'🤝 ร่วมงาน', rejected:'✖️ ไม่ร่วม' };
+async function loadLeads(){
+  if (!IS_ADMIN) return;
+  const { data, error } = await sb.from('supplier_leads').select('*').order('created_at', { ascending:false }).limit(200);
+  if (error) { console.error(error); return; }
+  $('#supTbl').innerHTML = `<tr><th>ผู้ติดต่อ</th><th>สินค้า / พื้นที่</th><th>สถานะ</th></tr>` + (data.map(r => `<tr>
+    <td><b>${esc(r.name)}</b>${r.farm?'<br>'+esc(r.farm):''}<br><a href="${telHref(r.phone)}">${esc(r.phone)}</a>${r.line_id?'<br>LINE '+esc(r.line_id):''}<br><span class="meta">${new Date(r.created_at).toLocaleDateString('th-TH')}</span></td>
+    <td>${esc(r.products||'-')}${r.area?'<br><span class="meta">📍 '+esc(r.area)+'</span>':''}${r.note?'<br><span class="meta">'+esc(r.note)+'</span>':''}</td>
+    <td><select class="in" style="width:auto;text-align:left" data-lead="${r.id}">${Object.entries(SUPST).map(([k,l])=>`<option value="${k}" ${k===r.status?'selected':''}>${l}</option>`).join('')}</select></td></tr>`).join('')
+    || '<tr><td colspan="3" class="meta">ยังไม่มีซัพพลายเออร์ติดต่อมา</td></tr>');
+}
+document.addEventListener('change', async e => { const id = e.target.dataset?.lead; if (!id || !IS_ADMIN) return;
+  const { error } = await sb.from('supplier_leads').update({ status:e.target.value }).eq('id', id); toast(error ? '❌ บันทึกไม่สำเร็จ' : '💾 อัปเดตสถานะแล้ว'); });
+document.addEventListener('click', e => { if (e.target.id==='supReload') loadLeads(); const v = e.target.closest('#views [data-v]'); if (v && v.dataset.v==='back') setTimeout(loadLeads, 60); });
+const _refreshAuth3 = refreshAuth;
+refreshAuth = async function(){ await _refreshAuth3(); if (IS_ADMIN) loadLeads(); };
