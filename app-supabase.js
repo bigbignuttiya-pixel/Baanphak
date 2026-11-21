@@ -150,26 +150,71 @@ document.getElementById('phDel').addEventListener('click', () => {
 }, true);
 savePhotos = () => true;
 
-/* ---------- 5) สั่งซื้อออนไลน์ → place_order (ราคาคิดจากฐานข้อมูล) ---------- */
+/* ---------- 5) สั่งซื้อออนไลน์ → place_order (ราคาคิดจากฐานข้อมูล) + ที่อยู่ + ชำระเงิน ---------- */
+const SHOP_PP = '0863515259';   // พร้อมเพย์ร้าน
+let cuLat = null, cuLng = null, payM = 'promptpay';
+const fld = 'width:100%;padding:9px;border-radius:10px;border:1px solid var(--line);font:inherit;margin:4px 0;box-sizing:border-box';
 const _renderCart = renderCart;
 renderCart = function(){
+  const keep = {}; ['cuName','cuPhone','cuAddr'].forEach(i=>{ const el=document.getElementById(i); if(el) keep[i]=el.value; });
   _renderCart();
   const ck = document.getElementById('checkout'); if (!ck || document.getElementById('cuName')) return;
-  ck.insertAdjacentHTML('beforebegin', `<input id="cuName" placeholder="ชื่อผู้รับ" style="width:100%;padding:8px;border-radius:10px;border:1px solid var(--line);font:inherit;margin:4px 0">
-    <input id="cuPhone" placeholder="เบอร์โทร" inputmode="tel" style="width:100%;padding:8px;border-radius:10px;border:1px solid var(--line);font:inherit;margin:4px 0">`);
+  const pickup = /รับเอง/.test(slot);
+  ck.insertAdjacentHTML('beforebegin', `<div style="margin-top:8px;font-family:Prompt;font-size:14px">📦 ข้อมูลผู้รับ</div>
+    <input id="cuName" placeholder="ชื่อผู้รับ" style="${fld}">
+    <input id="cuPhone" placeholder="เบอร์โทร" inputmode="tel" style="${fld}">
+    ${pickup ? '<div class="meta" style="margin:4px 0">🏪 รับเองที่ร้าน — ไม่ต้องกรอกที่อยู่ ไม่มีค่าส่ง</div>' : `
+    <textarea id="cuAddr" rows="2" placeholder="ที่อยู่จัดส่ง (บ้านเลขที่ ซอย ถนน จุดสังเกต)" style="${fld};resize:vertical"></textarea>
+    <button type="button" class="btn sm ghost full" id="cuGps" style="margin:2px 0 4px">${cuLat?'✅ ปักหมุดแล้ว':'📍 ใช้ตำแหน่งปัจจุบัน (ช่วยให้ส่งถูกที่)'}</button>`}
+    <div style="margin-top:6px;font-family:Prompt;font-size:14px">💳 วิธีชำระเงิน</div>
+    <div class="seg" style="margin:4px 0 8px"><button type="button" data-pay="promptpay" class="${payM==='promptpay'?'on':''}">พร้อมเพย์ (สแกน QR)</button><button type="button" data-pay="cod" class="${payM==='cod'?'on':''}">${pickup?'จ่ายที่ร้าน':'เก็บเงินปลายทาง'}</button></div>`);
+  for (const k in keep) { const el=document.getElementById(k); if(el) el.value=keep[k]; }
   ck.textContent = 'ยืนยันคำสั่งซื้อ';
 };
+document.addEventListener('click', e => {
+  const pb = e.target.closest('[data-pay]'); if (pb) { payM = pb.dataset.pay; pb.parentElement.querySelectorAll('button').forEach(b=>b.classList.toggle('on', b===pb)); return; }
+  if (e.target.id === 'cuGps') {
+    if (!navigator.geolocation) { toast('อุปกรณ์นี้ไม่รองรับการระบุตำแหน่ง'); return; }
+    e.target.textContent = 'กำลังหาตำแหน่ง…';
+    navigator.geolocation.getCurrentPosition(p => { cuLat = p.coords.latitude; cuLng = p.coords.longitude; e.target.textContent = '✅ ปักหมุดแล้ว'; },
+      () => { e.target.textContent = '📍 ใช้ตำแหน่งปัจจุบัน (ช่วยให้ส่งถูกที่)'; toast('ไม่ได้รับอนุญาตให้ใช้ตำแหน่ง — กรอกที่อยู่อย่างเดียวได้'); }, { enableHighAccuracy:true, timeout:10000 });
+  }
+});
 document.addEventListener('click', async e => {
   if (e.target.id !== 'checkout') return;
   e.stopImmediatePropagation();
   const name = $('#cuName').value.trim(), phone = $('#cuPhone').value.trim();
+  const pickup = /รับเอง/.test(slot), addr = pickup ? '' : ($('#cuAddr')?.value.trim() || '');
   if (!name || phone.replace(/\D/g,'').length < 9) { toast('กรอกชื่อและเบอร์โทรให้ครบก่อน'); return; }
+  if (!pickup && addr.length < 5) { toast('กรอกที่อยู่จัดส่งก่อน'); $('#cuAddr').focus(); return; }
   const items = Object.keys(cart).filter(k=>cart[k]>0).map(k=>({ id:k, qty:cart[k] }));
   e.target.disabled = true; e.target.textContent = 'กำลังส่งคำสั่งซื้อ…';
-  const { data, error } = await sb.rpc('place_order', { items, customer_name:name, phone, delivery_slot:slot, no_bag:noBag });
+  const { data, error } = await sb.rpc('place_order', { items, customer_name:name, phone, delivery_slot:slot, no_bag:noBag,
+    address: addr || null, lat: pickup?null:cuLat, lng: pickup?null:cuLng, pay_method: payM });
   if (error) { toast('❌ ส่งคำสั่งซื้อไม่สำเร็จ ลองใหม่อีกครั้ง'); console.error(error); e.target.disabled=false; e.target.textContent='ยืนยันคำสั่งซื้อ'; return; }
-  cart = {}; renderCart(); openCart(false);
-  openModal(`<h3>✅ รับคำสั่งซื้อแล้ว</h3><p>เลขที่ออเดอร์ <b>#${data.order_id}</b><br>ยอดรวม <b>${baht(data.total)}</b> (ค่าส่ง ${data.shipping?baht(data.shipping):'ฟรี'})<br>รอบส่ง ${slot}<br>แต้มรักษ์โลกที่ได้ 🌱 ${data.points}</p><p class="meta">ร้านจะติดต่อกลับที่เบอร์ ${phone}</p><button class="btn full" data-close>ตกลง</button>`);
+  cart = {}; cuLat = cuLng = null; renderCart(); openCart(false);
+  const sum = `เลขที่ออเดอร์ <b>#${data.order_id}</b><br>ยอดที่ต้องชำระ <b style="font-size:1.25em">${baht(data.total)}</b> (ค่าส่ง ${data.shipping?baht(data.shipping):'ฟรี'})<br>รอบส่ง ${esc(slot)}`;
+  if (payM === 'promptpay') {
+    openModal(`<h3>✅ รับคำสั่งซื้อแล้ว — ชำระเงิน</h3><p>${sum}</p>
+      <div style="text-align:center"><div id="ckQr" style="display:inline-block;padding:10px;background:#fff;border-radius:12px"></div>
+      <div class="meta">สแกนด้วยแอปธนาคาร · พร้อมเพย์ ${SHOP_PP.replace(/(\d{3})(\d{3})(\d{4})/,'$1-$2-$3')}</div></div>
+      <label class="btn full ghost" style="margin-top:10px;cursor:pointer">📎 แนบสลิปการโอน<input type="file" id="slipIn" accept="image/*" hidden></label>
+      <div id="slipMsg" class="meta" style="text-align:center;margin:6px 0"></div>
+      <button class="btn full" data-close>เสร็จสิ้น</button>`);
+    try { new QRCode(document.getElementById('ckQr'), { text: promptPay(SHOP_PP, data.total), width:200, height:200, correctLevel: QRCode.CorrectLevel.M }); } catch(err) { console.warn(err); }
+    document.getElementById('slipIn').onchange = async ev => {
+      const f = ev.target.files[0]; if (!f) return; const msg = document.getElementById('slipMsg');
+      if (f.size > 8e6) { msg.textContent = '❌ ไฟล์ใหญ่เกิน 8MB'; return; }
+      msg.textContent = 'กำลังส่งสลิป…';
+      const path = `slips/${data.order_id}-${Date.now()}.${(f.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')}`;
+      const up = await sb.storage.from('order-slips').upload(path, f, { contentType: f.type });
+      if (up.error) { msg.textContent = '❌ ส่งสลิปไม่สำเร็จ ลองอีกครั้ง'; console.error(up.error); return; }
+      const r = await sb.rpc('attach_slip', { order_id: data.order_id, path });
+      msg.textContent = r.error ? '❌ บันทึกสลิปไม่สำเร็จ' : '✅ ได้รับสลิปแล้ว ร้านจะตรวจสอบและจัดส่งตามรอบ';
+    };
+  } else {
+    openModal(`<h3>✅ รับคำสั่งซื้อแล้ว</h3><p>${sum}<br>ชำระเงิน: ${pickup?'จ่ายที่ร้าน':'เก็บเงินปลายทาง'}<br>แต้มรักษ์โลกที่ได้ 🌱 ${data.points}</p><p class="meta">ร้านจะติดต่อกลับที่เบอร์ ${esc(phone)}</p><button class="btn full" data-close>ตกลง</button>`);
+  }
 }, true);
 
 /* ---------- 6) บิลเคาน์เตอร์ → orders (channel = pos) ---------- */
@@ -245,12 +290,29 @@ function renderOrders(){
   $('#ordTbl').innerHTML = `<tr><th>#</th><th>เวลา</th><th>ลูกค้า</th><th>รอบส่ง</th><th class="r">ยอด</th><th>สถานะ</th></tr>` +
     (list.map(o => { const t = new Date(o.created_at);
       return `<tr class="k" data-ord="${o.id}"><td>#${o.id}</td><td>${t.toLocaleDateString('th-TH',{day:'numeric',month:'short'})} ${t.toTimeString().slice(0,5)}</td>
-        <td>${esc(o.customer_name||'-')}<br><span class="meta">${esc(o.phone||'')}</span></td><td class="meta">${esc(o.delivery_slot||'')}${o.no_bag?'<br>🌍 ไม่รับถุง':''}</td>
-        <td class="r">${baht(+o.total)}</td>
+        <td>${esc(o.customer_name||'-')}<br><a class="meta" href="tel:${esc(o.phone||'')}">${esc(o.phone||'')}</a></td><td class="meta">${esc(o.delivery_slot||'')}${o.no_bag?'<br>🌍 ไม่รับถุง':''}${o.address?'<br>🏠 '+esc(o.address):''}${o.lat?`<br><a href="https://maps.google.com/?q=${+o.lat},${+o.lng}" target="_blank" rel="noopener">📍 เปิดแผนที่</a>`:''}</td>
+        <td class="r">${baht(+o.total)}<br>${payBadge(o)}</td>
         <td><select data-os="${o.id}" class="in" style="width:auto;text-align:left">${Object.entries(ST).map(([k,v])=>`<option value="${k}" ${k===o.status?'selected':''}>${v}</option>`).join('')}</select></td></tr>
         <tr class="det" data-odet="${o.id}" hidden><td colspan="6">${o.order_items.map(i=>`${esc(i.name||i.kit_id||i.product_id)} — ${i.grams?(+i.grams)+' ก.':(+i.qty)+' ชิ้น'} · ${baht(+i.line_total)}`).join('<br>')}</td></tr>`; }).join('')
      || '<tr><td colspan="6" class="meta">ไม่มีออเดอร์ในกลุ่มนี้</td></tr>');
 }
+const payBadge = o => o.channel!=='online' ? '' : o.payment_method==='cod' ? '<span class="meta">💵 ปลายทาง</span>'
+  : o.pay_status==='paid' ? '<span style="color:#2f7d3c">✅ จ่ายแล้ว</span>'
+  : o.slip_path ? `<button class="btn sm ghost" data-slip="${o.id}">🧾 ดูสลิป</button>` : '<span style="color:#c62828">⏳ รอโอน</span>';
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-slip]'); if (!b || !IS_ADMIN) return; e.stopPropagation();
+  const o = ORDERS.find(x => String(x.id) === b.dataset.slip); if (!o) return;
+  const { data, error } = await sb.storage.from('order-slips').createSignedUrl(o.slip_path, 600);
+  if (error) { toast('❌ เปิดสลิปไม่ได้'); return; }
+  openModal(`<h3>สลิปออเดอร์ #${o.id} · ${baht(+o.total)}</h3><img src="${data.signedUrl}" style="width:100%;border-radius:10px"><div class="two" style="margin-top:10px"><button class="btn" data-paid="${o.id}">✅ ยืนยันรับเงินแล้ว</button><button class="btn ghost" data-close>ปิด</button></div>`);
+}, true);
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-paid]'); if (!b || !IS_ADMIN) return;
+  const { error } = await sb.from('orders').update({ pay_status:'paid' }).eq('id', b.dataset.paid);
+  if (error) { toast('❌ บันทึกไม่สำเร็จ'); return; }
+  const o = ORDERS.find(x => String(x.id) === b.dataset.paid); if (o) o.pay_status = 'paid';
+  closeModal(); toast('บันทึกรับเงินแล้ว'); renderOrders();
+});
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function renderPrep(){
   const open = ORDERS.filter(o => o.channel==='online' && ['new','packing'].includes(o.status));

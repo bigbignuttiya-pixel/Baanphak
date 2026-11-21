@@ -865,7 +865,7 @@ function renderCart(){
     <div class="qty"><button data-cdec="${k}">−</button><span>${baht(linePrice(k,cart[k]))}</span><button data-cinc="${k}">+</button></div>
   </div>`}).join('');
   const sub = keys.reduce((s,k)=>s+linePrice(k,cart[k]),0);
-  const ship = sub>=300 ? 0 : 30;
+  const ship = (sub>=300 || /รับเอง/.test(slot)) ? 0 : 30;
   const pts = Math.floor(sub/25) + (noBag?10:0);
   $('#cfoot').innerHTML = `
     <div class="l"><span>ยอดสินค้า</span><span>${baht(sub)}</span></div>
@@ -874,7 +874,7 @@ function renderCart(){
     <select id="slot">${['วันนี้ 16:00–18:00','วันนี้ 18:00–20:00','พรุ่งนี้ 07:00–09:00','พรุ่งนี้ 10:00–12:00','รับเองที่ร้าน'].map(s=>`<option ${s===slot?'selected':''}>${s}</option>`).join('')}</select>
     <div class="l"><span>แต้มที่จะได้รับ</span><span>🌱 ${pts} แต้ม</span></div>
     <div class="l t"><span>รวมทั้งสิ้น</span><span>${baht(sub+ship)}</span></div>
-    <button class="btn full" id="checkout" style="margin-top:8px">ยืนยันคำสั่งซื้อ (ตัวอย่าง)</button>`;
+    <button class="btn full" id="checkout" style="margin-top:8px">ยืนยันคำสั่งซื้อ</button>`;
 }
 function openCart(o){ $('#drawer').classList.toggle('on',o); $('#mask').classList.toggle('on',o); }
 
@@ -898,7 +898,7 @@ document.addEventListener('click',e=>{
 $('#mask').onclick=()=>openCart(false);
 document.addEventListener('change',e=>{
   if(e.target.id==='nobag'){ noBag=e.target.checked; renderCart(); }
-  if(e.target.id==='slot'){ slot=e.target.value; }
+  if(e.target.id==='slot'){ slot=e.target.value; renderCart(); }
 });
 $('#q').addEventListener('input',e=>{ query=e.target.value; renderShop(); });
 
@@ -1168,7 +1168,7 @@ const todayKey = () => new Date().toISOString().slice(0,10);
 const billNo = () => 'BP-' + todayKey().replace(/-/g,'').slice(2) + '-' + String(posSales.filter(s=>s.day===todayKey()).length+1).padStart(3,'0');
 
 function renderPos(){
-  $('#ppId').value = LS.get('bp_pp','');
+  $('#ppId').value = LS.get('bp_pp','') || '0863515259';
   $('#shopName').value = LS.get('bp_shop','บ้านผัก Baan Phak');
   const cats=[{id:'all',name:'ทั้งหมด'},...CATS];
   $('#posCats').innerHTML = cats.map(c=>`<button class="tab ${c.id===posCat?'on':''}" data-pc="${c.id}">${c.name}</button>`).join('');
@@ -1223,7 +1223,7 @@ function pay(method){
       <div class="change" id="cChange">เงินทอน ฿0</div><button class="btn full" id="cOk" disabled>✅ รับเงินและออกใบเสร็จ</button>`);
     showCash();
   } else if(method==='qr'){
-    const id = LS.get('bp_pp','');
+    const id = LS.get('bp_pp','') || '0863515259';
     if(!id){ openModal(`<h3>📱 พร้อมเพย์</h3><p>ยังไม่ได้ตั้งค่าเบอร์พร้อมเพย์ของร้าน ใส่ได้ที่ "⚙️ ตั้งค่าเคาน์เตอร์" ด้านล่าง</p><button class="btn full" data-close>ตกลง</button>`); return; }
     openModal(`<h3>📱 สแกนจ่ายพร้อมเพย์</h3><div class="c" style="text-align:center;font-family:Prompt;font-size:22px;color:#1e4fa3">${baht(total)}</div>
       <div id="qrBox"></div><div class="meta" style="text-align:center">พร้อมเพย์: ${maskId(id)}<br>ให้ลูกค้าสแกนด้วยแอปธนาคาร แล้วตรวจยอดเงินเข้าก่อนกดยืนยัน</div>
