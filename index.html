@@ -405,10 +405,7 @@ body.admin .views{display:flex;order:5;width:100%;margin:0;justify-content:cente
 /* ============ DATA ============ */
 // ผัก/ผลไม้: p = ราคาขายต่อ 100 กรัม (บาท), farm = สวนต้นทาง
 const CATS = [
-  {id:'kit',   name:'🍲 ชุดพร้อมปรุง'},
   {id:'pack',  name:'🥡 ผักแพ็กพร้อมปรุง'},
-  {id:'cut',   name:'🍉 ผลไม้ตัดพร้อมทาน'},
-  {id:'deco',  name:'🎁 ถาดผลไม้จัดแต่ง/กระเช้า'},
   {id:'leaf',  name:'🥬 ผักใบ'},
   {id:'fruitveg',name:'🍆 ผักผล/ผักฝัก'},
   {id:'root',  name:'🥕 หัว/ราก'},
@@ -417,6 +414,9 @@ const CATS = [
   {id:'fruit', name:'🍌 ผลไม้'},
   {id:'pantry',name:'🍚 ข้าว ไข่ น้ำมัน เครื่องปรุง'},
   {id:'home',  name:'🧴 ของใช้ในบ้าน'},
+  {id:'cut',   name:'🍉 ผลไม้ตัดพร้อมทาน'},
+  {id:'kit',   name:'🍲 ชุดพร้อมปรุง'},
+  {id:'deco',  name:'🎁 ถาดผลไม้จัดแต่ง/กระเช้า'},
 ];
 const VEG = [
   // ผักใบ
@@ -839,6 +839,7 @@ function renderShop(){
     else if(['pack','pantry','home'].includes(c.id)){ items = GOODS.filter(g=>g.c===c.id && match(g)); fn = c.id==='pack' ? packCard : goodCard; }
     else { items = VEG.filter(v=>v.c===c.id && match(v)); fn = vegCard; if(c.id==='fruit') items.sort((a,b)=>inSeason(b)-inSeason(a)); }
     if(!items.length) continue;
+    items = items.slice().sort((x,y)=>(photoOf(y.id)?1:0)-(photoOf(x.id)?1:0));
     const sub = c.id==='deco' ? 'จัดตามออเดอร์ งานเลี้ยง/ของขวัญ' : c.id==='fruit' ? 'ขายเป็นขีด · ป้ายเขียว = อยู่ในฤดู' : c.id==='cut' ? 'ปอก หั่น แช่เย็น พร้อมทาน' : c.id==='kit' ? 'เตรียมสด ล้าง หั่น ชั่งให้แล้ว' : c.id==='pack' ? 'แพ็กถาด พร้อมปรุง ราคาต่อแพ็ก' : (['pack','pantry','home'].includes(c.id) ? 'ราคาต่อชิ้น' : 'ขายเป็นขีด (100 ก.)');
     html += `<div class="sec-h"><h2>${c.name}</h2><span>${items.length} รายการ · ${sub}</span></div>${c.id==='fruit'?seasonStrip():''}<div class="${cls}">${items.map(fn).join('')}</div>`;
   }
