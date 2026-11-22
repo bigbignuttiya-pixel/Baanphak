@@ -3,13 +3,35 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>บ้านผัก — จากสวนถึงครัวคุณ</title>
+<title>บ้านผัก — ผักสด ผลไม้ ชุดพร้อมปรุง สั่งออนไลน์ส่งถึงบ้าน</title>
+<meta name="description" content="บ้านผัก ร้านผักสด ผลไม้ และชุดพร้อมปรุง ตัดสดทุกเช้า ผักขายเป็นขีด ชุดต้มยำ แกง ผัด ผลไม้ตัดพร้อมทาน ของใช้ในครัว สั่งออนไลน์ ส่งถึงบ้าน จ่ายพร้อมเพย์หรือเก็บเงินปลายทาง">
+<meta name="keywords" content="บ้านผัก, ผักสด, ผลไม้สด, ชุดพร้อมปรุง, ชุดต้มยำ, ผลไม้ตัดพร้อมทาน, สั่งผักออนไลน์, ส่งผักถึงบ้าน, ร้านผัก, Baan Phak">
+<link rel="canonical" href="https://baanphak.vercel.app/">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="บ้านผัก Baan Phak">
+<meta property="og:locale" content="th_TH">
+<meta property="og:url" content="https://baanphak.vercel.app/">
+<meta property="og:title" content="บ้านผัก — ผักสด ผลไม้ ชุดพร้อมปรุง ส่งถึงบ้าน">
+<meta property="og:description" content="ผักตัดสดทุกเช้า ขายเป็นขีด ชุดต้มยำ แกง ผัด ผลไม้ตัดพร้อมทาน สั่งออนไลน์ จ่ายพร้อมเพย์">
+<meta property="og:image" content="https://baanphak.vercel.app/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="บ้านผัก จากสวนถึงครัวคุณ — ผักสด ผลไม้ ชุดพร้อมปรุง">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="บ้านผัก — ผักสด ผลไม้ ชุดพร้อมปรุง ส่งถึงบ้าน">
+<meta name="twitter:description" content="ผักตัดสดทุกเช้า ชุดพร้อมปรุง ผลไม้ตัดพร้อมทาน สั่งออนไลน์ส่งถึงบ้าน">
+<meta name="twitter:image" content="https://baanphak.vercel.app/og.jpg">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"GroceryStore","@id":"https://baanphak.vercel.app/#store","name":"บ้านผัก","alternateName":"Baan Phak","slogan":"จากสวนถึงครัวคุณ","description":"บ้านผัก ร้านผักสด ผลไม้ และชุดพร้อมปรุง ตัดสดทุกเช้า ผักขายเป็นขีด ชุดต้มยำ แกง ผัด ผลไม้ตัดพร้อมทาน ของใช้ในครัว สั่งออนไลน์ ส่งถึงบ้าน จ่ายพร้อมเพย์หรือเก็บเงินปลายทาง","url":"https://baanphak.vercel.app/","logo":"https://baanphak.vercel.app/icon-512.png","image":"https://baanphak.vercel.app/og.jpg","telephone":"+66863515259","priceRange":"฿","currenciesAccepted":"THB","paymentAccepted":"PromptPay, Cash","openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],"opens":"06:00","closes":"19:00"}],"address":{"@type":"PostalAddress","addressCountry":"TH"},"sameAs":["https://www.facebook.com/share/18aBm9X737/","https://lin.ee/UeTdASD"],"hasOfferCatalog":{"@type":"OfferCatalog","name":"สินค้าบ้านผัก","itemListElement":[{"@type":"OfferCatalog","name":"ผักสด"},{"@type":"OfferCatalog","name":"ผลไม้สด"},{"@type":"OfferCatalog","name":"ผลไม้ตัดพร้อมทาน"},{"@type":"OfferCatalog","name":"ชุดพร้อมปรุง"},{"@type":"OfferCatalog","name":"ของใช้ในครัว"}]}}
+</script>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="icon-512.png">
 <meta name="theme-color" content="#2E6B34">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@600&family=Prompt:wght@400;500;600;700&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 :root{
   --bg:#f6f4ec; --card:#fff; --ink:#1f2a1c; --muted:#6b7563; --line:#e5e1d3;
   --green:#2f6b3a; --green2:#4f9a4a; --leaf:#e4f0dc; --orange:#e2742b; --cream:#fdf8e8;
@@ -266,6 +288,8 @@ body.admin .views{display:flex;order:5;width:100%;margin:0;justify-content:cente
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+<h1 class="sr-only">บ้านผัก — ร้านผักสด ผลไม้ และชุดพร้อมปรุง สั่งออนไลน์ส่งถึงบ้าน</h1>
+<noscript><p>บ้านผัก (Baan Phak) จากสวนถึงครัวคุณ — ผักสดตัดเช้า ขายเป็นขีด ชุดต้มยำ แกง ต้ม ผัด ผลไม้ตัดพร้อมทาน ผลไม้สด เห็ด สมุนไพร และของใช้ในครัว สั่งออนไลน์ จ่ายพร้อมเพย์ โทร 086-351-5259 เปิดทุกวัน 06:00–19:00 (กรุณาเปิด JavaScript เพื่อสั่งซื้อ)</p></noscript>
 <div class="top">
   <div class="brand"><svg class="bmark" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><g><path d="M60 8 Q63 8 66 10.5 L109 47 Q114 52 108 56 L104 56 L104 102 Q104 112 94 112 L26 112 Q16 112 16 102 L16 56 L12 56 Q6 52 11 47 L54 10.5 Q57 8 60 8 Z" fill="#FFFFFF"/><path d="M60 100 L60 72" stroke="#2E6B34" stroke-width="6" stroke-linecap="round" fill="none"/><path d="M60 76 C43 78 32 66 34 50 C50 49 61 58 60 76 Z" fill="#8BC34A"/><path d="M60 70 C61 51 75 40 92 43 C93 61 79 72 60 70 Z" fill="#2E6B34"/></g></svg> <span class="bn">บ้านผัก</span> <small>Baan Phak<br>จากสวนถึงครัวคุณ</small></div>
   <div class="views" id="views">

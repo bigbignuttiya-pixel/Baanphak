@@ -48,6 +48,23 @@ async function orderText(ev: string, id: number) {
   L.push(`💰 ยอดรวม ${baht(o.total)}`, `💳 ${PAY[o.payment_method] || o.payment_method || "-"}${o.channel === "pos" && o.received ? ` · รับ ${baht(o.received)} ทอน ${baht(o.change_amt)}` : ""}`);
   return L.join("\n");
 }
+const CUST: Record<string, string> = {
+  paid: "✅ ร้านได้รับเงินแล้ว ขอบคุณค่ะ",
+  new: "🆕 ร้านได้รับออเดอร์แล้ว",
+  packing: "🧺 กำลังคัดและแพ็กสินค้าให้คุณ",
+  delivering: "🛵 กำลังนำส่ง เตรียมรับของได้เลย",
+  done: "🎉 ส่งถึงเรียบร้อยแล้ว ขอบคุณที่อุดหนุนบ้านผักนะคะ",
+  cancelled: "❌ ออเดอร์นี้ถูกยกเลิก หากสงสัยโทร 086-351-5259",
+};
+async function custText(o: any, what: string) {
+  return `บ้านผัก · ออเดอร์ #${o.id}\n${CUST[what] || "สถานะอัปเดตแล้ว"}\n💰 ${baht(o.total)}${o.delivery_slot ? `\n🚚 ${o.delivery_slot}` : ""}\n(พิมพ์ "เลิกติดตาม ${o.id}" เพื่อหยุดรับแจ้งเตือน)`;
+}
+async function saveBasicId(token: string) {
+  const bi = await fetch("https://api.line.me/v2/bot/info", { headers: { Authorization: "Bearer " + token } });
+  const info = bi.ok ? await bi.json() : {};
+  if (info.basicId) await db.from("shop_info").update({ line_basic_id: info.basicId }).eq("id", 1);
+  return info;
+}
 async function verifySig(secret: string, body: string, sig: string | null) {
   if (!secret || !sig) return false;
   const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
@@ -64,7 +81,18 @@ Deno.serve(async (req) => {
   const hook = req.headers.get("x-hook-secret");
   if (hook) {
     if (!c || hook !== c.hook_secret) return json({ error: "forbidden" }, 403);
-    const { event, order_id } = JSON.parse(raw || "{}");
+    const { event, order_id, what } = JSON.parse(raw || "{}");
+    if (c.channel_token) {   // เก็บ LINE ID ร้าน (@xxxx) ไว้ให้ปุ่ม "รับแจ้งเตือนทาง LINE" หน้าเว็บ
+      const { data: si } = await db.from("shop_info").select("line_basic_id").eq("id", 1).maybeSingle();
+      if (si && !si.line_basic_id) await saveBasicId(c.channel_token);
+    }
+    if (event === "noop") return json({ ok: true });
+    if (event === "cust") {   // แจ้งลูกค้าที่กดติดตามออเดอร์
+      const { data: o } = await db.from("orders").select("id,total,delivery_slot,line_user_id").eq("id", order_id).single();
+      if (!o?.line_user_id) return json({ skipped: true });
+      const err = await lineApi(c.channel_token, "push", { to: o.line_user_id, messages: [{ type: "text", text: await custText(o, what) }] });
+      return json({ ok: !err, err });
+    }
     if ((event === "pos" && !c.notify_pos) || (event === "online_new" && !c.notify_online) || (event?.startsWith("online_") && event !== "online_new" && !c.notify_paid)) return json({ skipped: true });
     if (event === "pos") await new Promise((r) => setTimeout(r, 2500));   // รอรายการบิลบันทึกครบ
     const text = await orderText(event, order_id);
@@ -82,6 +110,23 @@ Deno.serve(async (req) => {
     for (const e of events) {
       const src = e.source || {}; const id = src.groupId || src.roomId || src.userId; const type = src.groupId ? "group" : src.roomId ? "room" : "user";
       const text = e.type === "message" && e.message?.type === "text" ? String(e.message.text).trim() : "";
+      // ลูกค้า: "ติดตาม <เลขออเดอร์> <รหัส>" รับแจ้งสถานะออเดอร์ของตัวเอง
+      const tr = text.match(/^ติดตาม\s*#?(\d+)\s+([a-z0-9]{6})/i);
+      if (tr && src.userId) {
+        const { data: o } = await db.from("orders").select("id,status,pay_status,total,delivery_slot,track_code").eq("id", +tr[1]).eq("channel", "online").maybeSingle();
+        const okc = o && String(o.track_code).toLowerCase() === tr[2].toLowerCase();
+        if (okc) await db.from("orders").update({ line_user_id: src.userId }).eq("id", o.id);
+        if (e.replyToken) await lineApi(c.channel_token, "reply", { replyToken: e.replyToken, messages: [{ type: "text", text: okc
+          ? `🔔 ติดตามออเดอร์ #${o.id} แล้ว\nร้านจะแจ้งที่นี่เมื่อรับเงิน แพ็กของ และออกส่ง\nสถานะตอนนี้: ${CUST[o.pay_status === "paid" && o.status === "new" ? "paid" : o.status] || o.status}`
+          : "❌ ไม่พบออเดอร์หรือรหัสไม่ถูกต้อง ลองกดปุ่ม \"รับแจ้งเตือนทาง LINE\" จากหน้าเว็บอีกครั้ง" }] });
+        continue;
+      }
+      const un = text.match(/^เลิกติดตาม\s*#?(\d+)/);
+      if (un && src.userId) {
+        await db.from("orders").update({ line_user_id: null }).eq("id", +un[1]).eq("line_user_id", src.userId);
+        if (e.replyToken) await lineApi(c.channel_token, "reply", { replyToken: e.replyToken, messages: [{ type: "text", text: `🔕 หยุดแจ้งเตือนออเดอร์ #${un[1]} แล้ว` }] });
+        continue;
+      }
       // ต้องพิมพ์ "เชื่อมต่อ <รหัส 6 หลักจากหลังบ้าน>" เท่านั้น กันลูกค้าที่แอดเพื่อนร้านได้รับออเดอร์ของคนอื่น
       const m = text.match(/^(?:เชื่อมต่อ|เปิดแจ้งเตือน)\s*([A-Za-z0-9]*)/);
       const join = Boolean(m && m[1].toLowerCase() === String(c.hook_secret || "").slice(0, 6).toLowerCase());
@@ -116,10 +161,10 @@ Deno.serve(async (req) => {
       const ep = URL_ + "/functions/v1/line-notify";
       const r = await fetch("https://api.line.me/v2/bot/channel/webhook/endpoint", { method: "PUT", headers: { "Content-Type": "application/json", Authorization: "Bearer " + c.channel_token }, body: JSON.stringify({ endpoint: ep }) });
       if (!r.ok) return json({ ok: false, error: "ตั้ง Webhook ไม่สำเร็จ (" + r.status + ") — ตรวจ Channel access token อีกครั้ง" });
-      const bi = await fetch("https://api.line.me/v2/bot/info", { headers: { Authorization: "Bearer " + c.channel_token } });
-      const info = bi.ok ? await bi.json() : {};
+      const info = await saveBasicId(c.channel_token);
       return json({ ok: true, bot: info.displayName || "", basicId: info.basicId || "" });
     }
+    if (body.action === "basic") { const info = await saveBasicId(c.channel_token); return json({ ok: !!info.basicId, basicId: info.basicId || "" }); }
     if (!(c.targets || []).length) return json({ error: "ยังไม่มีผู้รับ — แอดเพื่อน LINE ร้านแล้วพิมพ์ \"เชื่อมต่อ\"" }, 400);
     const errs = await pushAll(c, "🔔 ทดสอบแจ้งเตือนจากบ้านผัก\nถ้าเห็นข้อความนี้ แปลว่าระบบส่งบิลเข้า LINE พร้อมใช้งานแล้ว ✅");
     return json({ ok: errs.length === 0, errs });
